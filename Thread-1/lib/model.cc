@@ -34,12 +34,16 @@ EmbeddingGradient* calc_gradient(Embedding* embA, Embedding* embB, int label) {
     return gradA;
 }
 
-EmbeddingGradient* cold_start(Embedding* user, Embedding* item) {
+EmbeddingGradient* cold_start(Embedding* user, Embedding* item, std::mutex *m, unsigned &l) {
     // Do some downstream work, e.g. let the user watch this video
     a_slow_function(10);
     // Then we collect a label, e.g. whether the user finished watching the video
+    m->lock();
+    l = 1;
     int label = item->get_data()[0] > 1e-8? 0: 1;
-    return calc_gradient(user, item, label);
+    EmbeddingGradient* g = calc_gradient(user, item, label);
+    m->unlock();
+    return g;
 }
 
 Embedding* recommend(Embedding* user, std::vector<Embedding*> items) {

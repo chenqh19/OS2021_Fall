@@ -24,6 +24,10 @@ in `init`, sequential embedding initialization
 
 
 
+（use a queue to maintain the sequence before and after the slow function）
+
+
+
 task3:
 
 in `update`, update one user per instruction
