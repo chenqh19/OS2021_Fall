@@ -2,14 +2,12 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
-#include <mutex>
 
 #include "utils.h"
 #include "embedding.h"
 
 namespace proj1 {
 
-std::mutex mtx;
 
 Embedding::Embedding(int length) {
     this->data = new double[length];
@@ -179,12 +177,13 @@ EmbeddingMatrix EmbeddingHolder::read(std::string filename) {
 int EmbeddingHolder::append(Embedding* data) {
     mtx.lock();
     int indx = this->emb_matx.size();
-    mtx.unlock();
+    
     embbedingAssert(
         data->get_length() == this->emb_matx[0]->get_length(),
         "Embedding to append has a different length!", LEN_MISMATCH
     );
     this->emb_matx.push_back(data);
+    mtx.unlock();
     return indx;
 }
 

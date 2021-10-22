@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 namespace proj1 {
 
@@ -36,6 +37,7 @@ public:
 private:
     int length;
     double* data;
+    std::mutex mtx;
 };
 
 using EmbeddingMatrix = std::vector<Embedding*>;
