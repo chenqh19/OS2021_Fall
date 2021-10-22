@@ -83,7 +83,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 
             break;
         }
-        case RECOMMEND: {
+        /*case RECOMMEND: {
             int user_idx = inst.payloads[0];
             Embedding* user = users->get_embedding(user_idx);
             std::vector<Embedding*> item_pool;
@@ -95,7 +95,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
             Embedding* recommendation = recommend(user, item_pool);
             recommendation->write_to_stdout();
             break;
-        }
+        }*/
     }
 
 }
@@ -111,11 +111,11 @@ int main(int argc, char* argv[]) {
     std::mutex* mtx1 = &m1;
     std::mutex* mtx2 = &m2;
     std::mutex* mtx = &m;
-    proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q0.in");
-    proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q0.in");
-    proj1::Instructions instructions = proj1::read_instructrions("data/q0_instruction.tsv");
+    proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q1.in");
+    proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q1.in");
+    proj1::Instructions instructions = proj1::read_instructrions("data/q1_instruction.tsv");
     {
-        proj1::AutoTimer timer("q0");  // using this to print out timing of the block
+        proj1::AutoTimer timer("q1");  // using this to print out timing of the block
         // Run all the instructions
         for (proj1::Instruction inst : instructions) {
             proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
