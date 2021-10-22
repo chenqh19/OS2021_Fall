@@ -1,0 +1,5 @@
+/nologo
+/OUT:bazel-out/x64_windows-fastbuild/bin/lib/utils_lib.lib
+/MACHINE:X64
+bazel-out/x64_windows-fastbuild/bin/lib/_objs/utils_lib/utils.obj
+/ignore:4221

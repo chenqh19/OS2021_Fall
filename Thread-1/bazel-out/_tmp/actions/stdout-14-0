@@ -1,0 +1,104 @@
+q0.cc
+注意: 包含文件:  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vector
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\yvals_core.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vcruntime.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\sal.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\concurrencysal.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vadefs.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xkeycheck.h
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xmemory
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cstdint
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\yvals.h
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\crtdbg.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt.h
+注意: 包含文件:       C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vcruntime_new_debug.h
+注意: 包含文件:        C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vcruntime_new.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\crtdefs.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\use_ansi.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\stdint.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cstdlib
+注意: 包含文件:     C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\math.h
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_math.h
+注意: 包含文件:     C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\stdlib.h
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_malloc.h
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_search.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\stddef.h
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wstdlib.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\limits.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\limits
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cfloat
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\float.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\climits
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cwchar
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cstdio
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\stdio.h
+注意: 包含文件:        C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wstdio.h
+注意: 包含文件:         C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_stdio_config.h
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\wchar.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_memcpy_s.h
+注意: 包含文件:        C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\errno.h
+注意: 包含文件:        C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vcruntime_string.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wconio.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wctype.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wdirect.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wio.h
+注意: 包含文件:        C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_share.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wprocess.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wstring.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_wtime.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\sys/stat.h
+注意: 包含文件:        C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\sys/types.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xstddef
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cstddef
+注意: 包含文件:       C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xtr1common
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\initializer_list
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\new
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\exception
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\type_traits
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\malloc.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vcruntime_exception.h
+注意: 包含文件:       C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\eh.h
+注意: 包含文件:        C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_terminate.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xatomic.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\intrin0.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xutility
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cstring
+注意: 包含文件:      C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\string.h
+注意: 包含文件:       C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_memory.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\utility
+注意: 包含文件:  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\tuple
+注意: 包含文件:  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\string
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xstring
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\iosfwd
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cctype
+注意: 包含文件:    C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\ctype.h
+注意: 包含文件:  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\chrono
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\ratio
+注意: 包含文件:   C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\time.h
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xtimec.h
+注意: 包含文件:  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\iostream
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\istream
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\ostream
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\ios
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xlocnum
+注意: 包含文件:       C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cmath
+注意: 包含文件:       C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\streambuf
+注意: 包含文件:        C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xiosbase
+注意: 包含文件:         C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\share.h
+注意: 包含文件:         C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\system_error
+注意: 包含文件:          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\cerrno
+注意: 包含文件:          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\stdexcept
+注意: 包含文件:          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xcall_once.h
+注意: 包含文件:          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xerrc.h
+注意: 包含文件:         C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xlocale
+注意: 包含文件:          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\memory
+注意: 包含文件:           C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\typeinfo
+注意: 包含文件:            C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vcruntime_typeinfo.h
+注意: 包含文件:          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xfacet
+注意: 包含文件:          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xlocinfo
+注意: 包含文件:           C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xlocinfo.h
+注意: 包含文件:            C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\locale.h
+注意: 包含文件:  C:\users\17466\_bazel_17466\bqbye5f4\execroot\__main__\lib/utils.h
+注意: 包含文件:  C:\users\17466\_bazel_17466\bqbye5f4\execroot\__main__\lib/model.h
+注意: 包含文件:   C:\users\17466\_bazel_17466\bqbye5f4\execroot\__main__\lib\embedding.h
+注意: 包含文件:  C:\users\17466\_bazel_17466\bqbye5f4\execroot\__main__\lib/instruction.h
