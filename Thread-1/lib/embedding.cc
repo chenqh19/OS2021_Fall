@@ -175,7 +175,6 @@ EmbeddingMatrix EmbeddingHolder::read(std::string filename) {
 }
 
 int EmbeddingHolder::append(Embedding* data) {
-    mtx.lock();
     int indx = this->emb_matx.size();
     
     embbedingAssert(
@@ -183,7 +182,6 @@ int EmbeddingHolder::append(Embedding* data) {
         "Embedding to append has a different length!", LEN_MISMATCH
     );
     this->emb_matx.push_back(data);
-    mtx.unlock();
     return indx;
 }
 

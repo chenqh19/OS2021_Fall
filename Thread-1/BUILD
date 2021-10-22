@@ -38,7 +38,7 @@ cc_binary(
     copts = [
         "-std=c++11",
     ],
-    data = glob(["data/q1*"]),
+    data = glob(["data/q0*"]),
 )
 
 cc_binary(

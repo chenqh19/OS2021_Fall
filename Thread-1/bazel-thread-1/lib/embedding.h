@@ -37,7 +37,6 @@ public:
 private:
     int length;
     double* data;
-    std::mutex mtx;
 };
 
 using EmbeddingMatrix = std::vector<Embedding*>;

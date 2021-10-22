@@ -29,6 +29,16 @@ cc_binary(
     srcs = [
         "q1.cc"
             ],
+    deps = [
+        "//lib:embedding_lib",
+        "//lib:instruction_lib",
+        "//lib:utils_lib",
+        "//lib:model_lib"
+    ],
+    copts = [
+        "-std=c++11",
+    ],
+    data = glob(["data/q0*"]),
 )
 
 cc_binary(
@@ -36,6 +46,16 @@ cc_binary(
     srcs = [
         "q2.cc"
             ],
+    deps = [
+        "//lib:embedding_lib",
+        "//lib:instruction_lib",
+        "//lib:utils_lib",
+        "//lib:model_lib"
+    ],
+    copts = [
+        "-std=c++11",
+    ],
+    data = glob(["data/q2*"]),
 )
 
 cc_binary(
@@ -43,6 +63,16 @@ cc_binary(
     srcs = [
         "q3.cc"
             ],
+    deps = [
+        "//lib:embedding_lib",
+        "//lib:instruction_lib",
+        "//lib:utils_lib",
+        "//lib:model_lib"
+    ],
+    copts = [
+        "-std=c++11",
+    ],
+    data = glob(["data/q3*"]),
 )
 
 cc_test(
