@@ -5,15 +5,18 @@
 #include <chrono>   // timer
 #include <iostream> // cout, endl
 #include <mutex>
+#include <vector>
+#include <windows.h>
 
 #include "lib/utils.h"
 #include "lib/model.h" 
 #include "lib/embedding.h" 
 #include "lib/instruction.h"
 
+
 namespace proj1 {
 
-void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex mtx1) {
+void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex mtx1, std::mutex mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2) {
     switch (inst.order) {
         case INIT_EMB: {
             // We need to init the embedding
@@ -41,6 +44,28 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
             //if (inst.payloads.size() > 3) {
             //    epoch = inst.payloads[3];
             //}
+            bool flag = 0;
+            do {
+                mtx2.lock();
+                for (int i = 0; i < lock1.size(); i++) {
+                    if (user_idx == lock1[i]) {
+                        flag = 1;
+                    }
+                }
+                for (int i = 0; i < lock2.size(); i++) {
+                    if (item_idx == lock2[i]) {
+                        flag = 1;
+                    }
+                }
+                if (flag == 0) {
+                    lock2.push_back(item_idx);
+                    lock1.push_back(user_idx);
+                } 
+                mtx2.unlock();
+                if (flag == 1) {
+                    Sleep(1);
+                }
+            } while (flag == 1);
             Embedding* user = users->get_embedding(user_idx);
             Embedding* item = items->get_embedding(item_idx);
             EmbeddingGradient* gradient = calc_gradient(user, item, label);
@@ -49,6 +74,11 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
             gradient = calc_gradient(item, user, label);
             items->update_embedding(item_idx, gradient, 0.001);
             delete gradient;
+            mtx2.lock();
+            lock1.remove(user_idx);
+            lock2.remove(item_idx);
+            mtx2.unlock();
+
             break;
         }
         /*case RECOMMEND: {
@@ -71,8 +101,10 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 
 int main(int argc, char* argv[]) {
 
-
+    std::vector<unsigned> lock1;
+    std::vector<unsigned> lock2;
     std::mutex mtx1;
+    std::mutex mtx2;
     proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q0.in");
     proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q0.in");
     proj1::Instructions instructions = proj1::read_instructrions("data/q0_instruction.tsv");
@@ -80,7 +112,7 @@ int main(int argc, char* argv[]) {
         proj1::AutoTimer timer("q0");  // using this to print out timing of the block
         // Run all the instructions
         for (proj1::Instruction inst : instructions) {
-            proj1::run_one_instruction(inst, users, items,mtx1);
+            proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2);
         }
     }
 
