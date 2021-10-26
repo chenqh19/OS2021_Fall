@@ -7,6 +7,7 @@
 #include <mutex>
 #include <vector>
 #include <windows.h>
+#include <thread>
 
 #include "lib/utils.h"
 #include "lib/model.h" 
@@ -111,14 +112,17 @@ int main(int argc, char* argv[]) {
     std::mutex* mtx1 = &m1;
     std::mutex* mtx2 = &m2;
     std::mutex* mtx = &m;
+    std::vector<std::thread> instru;
     proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q1.in");
     proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q1.in");
     proj1::Instructions instructions = proj1::read_instructrions("data/q1_instruction.tsv");
     {
         proj1::AutoTimer timer("q1");  // using this to print out timing of the block
         // Run all the instructions
+        
         for (proj1::Instruction inst : instructions) {
-            proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
+            //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
+            instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
         }
     }
 
