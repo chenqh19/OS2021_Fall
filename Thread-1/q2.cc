@@ -26,8 +26,32 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
             mtx->lock();
             int user_idx = users->append(new_user);
             mtx->unlock();
-            mtx1->lock();
-            int i = 0;
+            bool flag = 0;
+            do {
+                mtx2->lock();
+                for (int i = 0; i < lock1.size(); i++) {
+                    if (user_idx == lock1[i]) {
+                        flag = 1;
+                    }
+                }
+                for (int item_index : inst.payloads) {
+                    for (int i = 0; i < lock2.size(); i++) {
+                        if (item_index == lock2[i]) {
+                            flag = 1;
+                        }
+                    }
+                }
+                if (flag == 0) {
+                    for (int item_index : inst.payloads) {
+                        lock2.push_back(item_index);
+                    }
+                    lock1.push_back(user_idx);
+                } 
+                mtx2->unlock();
+                if (flag == 1) {
+                    Sleep(1);
+                }
+            } while (flag == 1);
             for (int item_index : inst.payloads) {
                 Embedding* item_emb = items->get_embedding(item_index);
                 // Call cold start for downstream applications, slow
@@ -35,7 +59,12 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 users->update_embedding(user_idx, gradient, 0.01);
                 delete gradient;
             }
-            mtx1->unlock();
+            mtx2->lock();
+            std::remove(lock1.begin(),lock1.end(),user_idx);
+            for (int item_index : inst.payloads) {
+                std::remove(lock2.begin(),lock2.end(),item_index);
+            }
+            mtx2->unlock();
             break;
         }
         case UPDATE_EMB: {
