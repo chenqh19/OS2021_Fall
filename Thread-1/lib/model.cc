@@ -34,7 +34,7 @@ EmbeddingGradient* calc_gradient(Embedding* embA, Embedding* embB, int label) {
     return gradA;
 }
 
-EmbeddingGradient* cold_start(Embedding* user, Embedding* item, std::mutex *m) {
+EmbeddingGradient* cold_start(Embedding* user, Embedding* item) {
     // Do some downstream work, e.g. let the user watch this video
     a_slow_function(10);
     // Then we collect a label, e.g. whether the user finished watching the video

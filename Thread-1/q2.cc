@@ -17,6 +17,10 @@
 
 namespace proj1 {
 
+void para_cold_start(EmbeddingGradient ** gradient, Embedding* user, Embedding* item) {
+    gradient = cold_start(user, item);
+}
+
 void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx) {
     switch (inst.order) {
         case INIT_EMB: {
@@ -52,12 +56,21 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                     Sleep(1);
                 }
             } while (flag == 1);
-            for (int item_index : inst.payloads) {
+            std::vector<EmbeddingGradient*> gradient_vec(inst.payloads.size());
+            std::vector<std::thread> instru;
+            for (int i = 0; i < inst.payloads.size(); i++) {
+                int item_index = inst.payloads[i];                
                 Embedding* item_emb = items->get_embedding(item_index);
                 // Call cold start for downstream applications, slow
-                EmbeddingGradient* gradient = cold_start(new_user, item_emb);
-                users->update_embedding(user_idx, gradient, 0.01);
-                delete gradient;
+                // EmbeddingGradient* gradient = cold_start(new_user, item_emb);
+                instru.push_back(std::thread(proj1::para_cold_start, &gradient_vec[i], new_user, item_emb));
+                
+                
+            }
+            for (int i = 0; i < inst.payloads.size(); i++) {
+                instru[i].join();
+                users->update_embedding(user_idx, gradient_vec[i], 0.01);
+                delete gradient_vec[i];
             }
             mtx2->lock();
             std::remove(lock1.begin(),lock1.end(),user_idx);
@@ -132,6 +145,8 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 }
 } // namespace proj1
 
+
+
 int main(int argc, char* argv[]) {
 
     std::vector<unsigned> lock1;
@@ -153,6 +168,9 @@ int main(int argc, char* argv[]) {
         for (proj1::Instruction inst : instructions) {
             //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
             instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
+        }
+        for (auto t : instru) {
+            t.join();
         }
     }
 
