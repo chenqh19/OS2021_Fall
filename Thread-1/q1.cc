@@ -154,6 +154,9 @@ int main(int argc, char* argv[]) {
             //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
             instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
         }
+        for (auto t : instru) {
+            t.join();
+        }
     }
 
     // Write the result
