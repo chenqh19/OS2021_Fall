@@ -17,7 +17,7 @@
 
 namespace proj1 {
 
-void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, std::mutex* mtx3, unsigned l0) {
+void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx) {
     switch (inst.order) {
         case INIT_EMB: {
             // We need to init the embedding
@@ -26,13 +26,16 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
             mtx->lock();
             int user_idx = users->append(new_user);
             mtx->unlock();
+            mtx1->lock();
+            int i = 0;
             for (int item_index : inst.payloads) {
                 Embedding* item_emb = items->get_embedding(item_index);
                 // Call cold start for downstream applications, slow
-                EmbeddingGradient* gradient = cold_start(new_user, item_emb, mtx3);
+                EmbeddingGradient* gradient = cold_start(new_user, item_emb);
                 users->update_embedding(user_idx, gradient, 0.01);
                 delete gradient;
             }
+            mtx1->unlock();
             break;
         }
         case UPDATE_EMB: {
@@ -104,23 +107,23 @@ int main(int argc, char* argv[]) {
 
     std::vector<unsigned> lock1;
     std::vector<unsigned> lock2;
-    std::mutex m;
+    std::mutex m; 
     std::mutex m1; 
     std::mutex m2; 
-    std::mutex m3;
     std::mutex* mtx1 = &m1;
     std::mutex* mtx2 = &m2;
-    std::mutex* mtx3 = &m3;
     std::mutex* mtx = &m;
-    std::queue<unsigned> qslow;
+    std::vector<std::thread> instru;
     proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q1.in");
     proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q1.in");
     proj1::Instructions instructions = proj1::read_instructrions("data/q1_instruction.tsv");
     {
         proj1::AutoTimer timer("q1");  // using this to print out timing of the block
         // Run all the instructions
+        
         for (proj1::Instruction inst : instructions) {
-            std::thread a( proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx, mtx3, l0));
+            //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
+            instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
         }
     }
 
