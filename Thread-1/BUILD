@@ -76,9 +76,9 @@ cc_binary(
 )
 
 cc_binary(
-    name = "q4",
+    name = "q40",
     srcs = [
-        "q4.cc"
+        "q40.cc"
             ],
     deps = [
         "//lib:embedding_lib",

@@ -6,7 +6,6 @@
 #include <iostream> // cout, endl
 #include <mutex>
 #include <vector>
-#include <queue>
 #include <windows.h>
 #include <thread>
 
@@ -146,23 +145,36 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 
 }
 
-void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, int &curr_iter, unsigned &curr_thread, bool &mode) {
-    if (inst.order == 1) {
-        mtx1->lock();
+void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, int &curr_iter, int &curr_thread){
+    if(inst.order == 1){
+        std::cout<<"2"<<std::endl;
         int iter_idx = inst.payloads[3];
+        while (iter_idx > (signed)curr_iter) {
+            Sleep(1);
+        }
+        mtx1->lock();
         curr_iter = iter_idx;
         curr_thread ++;
         mtx1->unlock();
-    }
 
-    run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
-    if (inst.order == 1) {
+        run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
+
         mtx1->lock();
         curr_thread --;
         if(curr_thread == 0){
-            mode = 0;
+            curr_iter += 1;
         }
         mtx1->unlock(); 
+    }
+    else {
+        std::cout<<"1"<<std::endl;
+        int iter_idx = inst.payloads[1];
+        while (iter_idx > (signed)curr_iter) {
+            Sleep(1);
+        }
+        run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
+        
+
     }
 }
 
@@ -174,26 +186,26 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
 
 int main(int argc, char* argv[]) {
 
+    std::cout<<"5"<<std::endl;
+    
     std::vector<unsigned> lock1;
     std::vector<unsigned> lock2;
     std::mutex m; 
     std::mutex m1; 
     std::mutex m2; 
-    std::mutex m3; 
     std::mutex* mtx1 = &m1;
     std::mutex* mtx2 = &m2;
-    std::mutex* mtx3 = &m3;
     std::mutex* mtx = &m;
     std::vector<std::thread> instru;
-    int curr_iter = -1;
+    int curr_iter = 0;
     unsigned queued_iter = 0;
-    unsigned curr_thread = 0;
-    bool mode = 0;
-    std::queue<proj1::Instruction> recommend_queue;
+    int curr_thread = 0;
+    std::vector<proj1::Instruction> inst_queue;
     proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q4.in");
     proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q4.in");
     proj1::Instructions instructions = proj1::read_instructrions("data/q4_instruction.tsv");
     {
+        std::cout<<"4"<<std::endl;
         proj1::AutoTimer timer("q4");  // using this to print out timing of the block
         // Run all the instructions
         for (proj1::Instruction inst : instructions) {
@@ -207,25 +219,20 @@ int main(int argc, char* argv[]) {
             curr_iter = iter_idx;
             curr_thread ++;
             mtx1->unlock();*/
-            if (inst.order == 1) {
-                int iter_idx = inst.payloads[3];
-                while (iter_idx > curr_iter) {
-                    Sleep(1);
-                    if (mode == 0) {
-                        while (!recommend_queue.empty()) {
-                            proj1::Instruction reco = recommend_queue.front();
-                            instru.push_back(std::thread(proj1::run_one_instruction_iter, reco, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread), std::ref(mode)));
-                        }
-                        mode = 1;
-                    }
-                }
-                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread), std::ref(mode)));
-            } else if(inst.order == 2){
-                recommend_queue.push(inst);
+            std::cout<<"3"<<std::endl;
+            if(inst.order == 1){
+                
+                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread)));
+
             }
-            else{
+            else if (inst.order == 0){
                 instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
             }
+            else{
+                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread)));
+
+            }
+           
             
 
             /*mtx1->lock();
@@ -238,18 +245,18 @@ int main(int argc, char* argv[]) {
 
             
         }
+
         // for (proj1::Instruction inst : instructions) {
         //     //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
         //     instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
         // }
         for (auto&t : instru) {
              t.join();
-         }
+        }
     }
 
     // Write the result
-    users->write_to_stdout();
-    items->write_to_stdout();
+    
 
     // We only need to delete the embedding holders, as the pointers are all
     // pointing at the emb_matx of the holders.
@@ -258,3 +265,4 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
