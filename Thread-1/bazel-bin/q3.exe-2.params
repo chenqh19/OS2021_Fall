@@ -1,0 +1,12 @@
+/nologo
+/OUT:bazel-out/x64_windows-fastbuild/bin/q3.exe
+bazel-out/x64_windows-fastbuild/bin/_objs/q3/q3.obj
+bazel-out/x64_windows-fastbuild/bin/lib/instruction_lib.lib
+bazel-out/x64_windows-fastbuild/bin/lib/model_lib.lib
+bazel-out/x64_windows-fastbuild/bin/lib/embedding_lib.lib
+bazel-out/x64_windows-fastbuild/bin/lib/utils_lib.lib
+/SUBSYSTEM:CONSOLE
+/MACHINE:X64
+/DEFAULTLIB:msvcrt.lib
+/DEBUG:FASTLINK
+/INCREMENTAL:NO

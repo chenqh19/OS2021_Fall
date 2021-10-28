@@ -18,7 +18,8 @@
 namespace proj1 {
 
 void para_cold_start(EmbeddingGradient ** gradient, Embedding* user, Embedding* item) {
-    gradient->append(cold_start(user, item));
+    EmbeddingGradient* g = cold_start(user, item);
+    *gradient = g;
 }
 
 void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx) {
@@ -67,11 +68,15 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 
                 
             }
-            for (int i = 0; i < inst.payloads.size(); i++) {
-                instru[i].join();
+            for (auto&t : instru) {
+                t.join();
+            }
+            for (int i = 0; i < gradient_vec.size(); i++) {
+                //instru[i].join();
                 users->update_embedding(user_idx, gradient_vec[i], 0.01);
                 delete gradient_vec[i];
             }
+            
             mtx2->lock();
             std::remove(lock1.begin(),lock1.end(),user_idx);
             for (int item_index : inst.payloads) {
@@ -158,18 +163,18 @@ int main(int argc, char* argv[]) {
     std::mutex* mtx2 = &m2;
     std::mutex* mtx = &m;
     std::vector<std::thread> instru;
-    proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q1.in");
-    proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q1.in");
-    proj1::Instructions instructions = proj1::read_instructrions("data/q1_instruction.tsv");
+    proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q2.in");
+    proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q2.in");
+    proj1::Instructions instructions = proj1::read_instructrions("data/q2_instruction.tsv");
     {
-        proj1::AutoTimer timer("q1");  // using this to print out timing of the block
+        proj1::AutoTimer timer("q2");  // using this to print out timing of the block
         // Run all the instructions
         
         for (proj1::Instruction inst : instructions) {
             //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
             instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
         }
-        for (auto t : instru) {
+        for (auto&t : instru) {
             t.join();
         }
     }

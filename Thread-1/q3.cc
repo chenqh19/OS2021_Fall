@@ -18,7 +18,8 @@
 namespace proj1 {
 
 void para_cold_start(EmbeddingGradient ** gradient, Embedding* user, Embedding* item) {
-    gradient = cold_start(user, item);
+    EmbeddingGradient* g = cold_start(user, item);
+    *gradient = g;
 }
 
 void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx) {
@@ -144,7 +145,12 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 
 }
 
-void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, unsigned curr_iter, unsigned curr_thread){
+void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, unsigned &curr_iter, unsigned &curr_thread){
+    
+    int iter_idx = inst.payloads[3];
+    while (iter_idx > curr_iter) {
+                    Sleep(1);
+                }
     mtx1->lock();
     curr_iter = iter_idx;
     curr_thread ++;
@@ -181,11 +187,11 @@ int main(int argc, char* argv[]) {
     unsigned queued_iter = 0;
     unsigned curr_thread = 0;
     std::vector<proj1::Instruction> inst_queue;
-    proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q1.in");
-    proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q1.in");
-    proj1::Instructions instructions = proj1::read_instructrions("data/q1_instruction.tsv");
+    proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q3.in");
+    proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q3.in");
+    proj1::Instructions instructions = proj1::read_instructrions("data/q3_instruction.tsv");
     {
-        proj1::AutoTimer timer("q1");  // using this to print out timing of the block
+        proj1::AutoTimer timer("q3");  // using this to print out timing of the block
         // Run all the instructions
         for (proj1::Instruction inst : instructions) {
             // decode, check whether can start parallelism
@@ -198,11 +204,16 @@ int main(int argc, char* argv[]) {
             curr_iter = iter_idx;
             curr_thread ++;
             mtx1->unlock();*/
-            int iter_idx = inst.payloads[3];
-            while (iter_idx > curr_iter) {
-                Sleep(1);
+            if(inst.order == 1){
+                
+                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread)));
+
             }
-            instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, curr_iter, curr_thread));
+            else{
+                instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
+            }
+           
+            
 
             /*mtx1->lock();
             curr_thread --;
@@ -214,13 +225,14 @@ int main(int argc, char* argv[]) {
 
             
         }
+
         // for (proj1::Instruction inst : instructions) {
         //     //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
         //     instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
         // }
-        // for (auto t : instru) {
-        //     t.join();
-        // }
+        for (auto&t : instru) {
+             t.join();
+        }
     }
 
     // Write the result
