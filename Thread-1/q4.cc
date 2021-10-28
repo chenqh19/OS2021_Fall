@@ -6,6 +6,7 @@
 #include <iostream> // cout, endl
 #include <mutex>
 #include <vector>
+#include <queue>
 #include <windows.h>
 #include <thread>
 
@@ -127,7 +128,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 
             break;
         }
-        /*case RECOMMEND: {
+        case RECOMMEND: {
             int user_idx = inst.payloads[0];
             Embedding* user = users->get_embedding(user_idx);
             std::vector<Embedding*> item_pool;
@@ -139,25 +140,28 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
             Embedding* recommendation = recommend(user, item_pool);
             recommendation->write_to_stdout();
             break;
-        }*/
+        }
     }
 
 }
 
 void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, unsigned curr_iter, unsigned curr_thread){
-    mtx1->lock();
-    curr_iter = iter_idx;
-    curr_thread ++;
-    mtx1->unlock();
+    if (inst.order != RECOMMEND) {
+        mtx1->lock();
+        curr_iter = iter_idx;
+        curr_thread ++;
+        mtx1->unlock();
+    }
 
     run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
-
-    mtx1->lock();
-    curr_thread --;
-    if(curr_thread == 0){
-        curr_iter += 1;
+    if (inst.order != RECOMMEND) {
+        mtx1->lock();
+        curr_thread --;
+        if(curr_thread == 0){
+            mode = 0;
+        }
+        mtx1->unlock(); 
     }
-    mtx1->unlock(); 
 }
 
 
@@ -173,14 +177,17 @@ int main(int argc, char* argv[]) {
     std::mutex m; 
     std::mutex m1; 
     std::mutex m2; 
+    std::mutex m3; 
     std::mutex* mtx1 = &m1;
     std::mutex* mtx2 = &m2;
+    std::mutex* mtx3 = &m3;
     std::mutex* mtx = &m;
     std::vector<std::thread> instru;
-    unsigned curr_iter = 0;
+    int curr_iter = -1;
     unsigned queued_iter = 0;
     unsigned curr_thread = 0;
-    std::vector<proj1::Instruction> inst_queue;
+    bool mode = 0;
+    std::queue<proj1::Instruction> recommend_queue;
     proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q1.in");
     proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q1.in");
     proj1::Instructions instructions = proj1::read_instructrions("data/q1_instruction.tsv");
@@ -198,11 +205,22 @@ int main(int argc, char* argv[]) {
             curr_iter = iter_idx;
             curr_thread ++;
             mtx1->unlock();*/
-            int iter_idx = inst.payloads[3];
-            while (iter_idx > curr_iter) {
-                Sleep(1);
+            if (inst.order != RECOMMEND) {
+                int iter_idx = inst.payloads[3];
+                while (iter_idx > curr_iter) {
+                    Sleep(1);
+                    if (mode == 0) {
+                        while (!recommend_queue.empty()) {
+                            proj1::Instruction reco = recommend_queue.pop();
+                            instru.push_back(std::thread(proj1::run_one_instruction_iter, reco, users, items, mtx1, mtx2, lock1, lock2, mtx, curr_iter, curr_thread));
+                        }
+                    }
+                }
+                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, curr_iter, curr_thread));
+            } else {
+                recommend_queue.push(inst);
             }
-            instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, curr_iter, curr_thread));
+            
 
             /*mtx1->lock();
             curr_thread --;
