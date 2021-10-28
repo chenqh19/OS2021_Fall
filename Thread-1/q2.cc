@@ -18,7 +18,7 @@
 namespace proj1 {
 
 void para_cold_start(EmbeddingGradient ** gradient, Embedding* user, Embedding* item) {
-    gradient = cold_start(user, item);
+    gradient->append(cold_start(user, item));
 }
 
 void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx) {

@@ -143,7 +143,30 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
     }
 
 }
+
+void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, unsigned curr_iter, unsigned curr_thread){
+    int iter_idx = inst.payloads[3];
+    while (iter_idx > curr_iter) {
+        Sleep(1);
+    }
+    mtx1->lock();
+    curr_iter = iter_idx;
+    curr_thread ++;
+    mtx1->unlock();
+
+    run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
+
+    mtx1->lock();
+    curr_thread --;
+    if(curr_thread == 0){
+        curr_iter += 1;
+    }
+    mtx1->unlock(); 
+}
+
+
 } // namespace proj1
+
 
 
 
@@ -170,17 +193,27 @@ int main(int argc, char* argv[]) {
         // Run all the instructions
         for (proj1::Instruction inst : instructions) {
             // decode, check whether can start parallelism
-            if (inst.order == UPDATE_EMB) {
-                int iter_idx = inst.payloads[3];
-                while (iter_idx > curr_iter) {
-                    Sleep(1);
-                }
-                mtx1->lock();
-                curr_iter = iter_idx;
-                curr_thread ++;
-                mtx1->unlock();
-
+           
+            /*int iter_idx = inst.payloads[3];
+            while (iter_idx > curr_iter) {
+                Sleep(1);
             }
+            mtx1->lock();
+            curr_iter = iter_idx;
+            curr_thread ++;
+            mtx1->unlock();*/
+
+            instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, curr_iter, curr_thread));
+
+            /*mtx1->lock();
+            curr_thread --;
+            if(curr_thread == 0){
+                curr_iter += 1;
+            }
+            mtx1->unlock();*/
+
+
+            
         }
         // for (proj1::Instruction inst : instructions) {
         //     //proj1::run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
