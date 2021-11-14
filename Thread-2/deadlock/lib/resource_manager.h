@@ -28,6 +28,9 @@ private:
     std::map<RESOURCE, std::mutex> resource_mutex;
     std::map<RESOURCE, std::condition_variable> resource_cv;
     ThreadManager *tmgr;
+    // std::map<PROCESS, std::map<RESOURCE, int>> resource_max;
+    // std::map<PROCESS, std::map<RESOURCE, int>> resource_allocation;
+    // std::map<PROCESS, std::map<RESOURCE, int>> resource_need;
 };
 
 }  // namespce: proj2

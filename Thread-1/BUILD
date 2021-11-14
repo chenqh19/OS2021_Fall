@@ -76,9 +76,10 @@ cc_binary(
 )
 
 cc_binary(
-    name = "q40",
+    linkopts = ["-lpthread"],
+    name = "q4",
     srcs = [
-        "q40.cc"
+        "q4.cc"
             ],
     deps = [
         "//lib:embedding_lib",
