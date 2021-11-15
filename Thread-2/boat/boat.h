@@ -1,7 +1,7 @@
 #ifndef BOAT_H_
 #define BOAT_H_
 
-#include<stdio.h>
+#include <stdio.h>
 #include <thread>
 #include <mutex>
 #include <unistd.h>
