@@ -76,7 +76,6 @@ cc_binary(
 )
 
 cc_binary(
-    linkopts = ["-lpthread"],
     name = "q4",
     srcs = [
         "q4.cc"

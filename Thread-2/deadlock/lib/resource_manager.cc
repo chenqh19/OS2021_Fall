@@ -15,7 +15,25 @@ int ResourceManager::request(RESOURCE r, int amount) {
             lk, std::chrono::milliseconds(100),
             [this, r, amount] { return this->resource_amount[r] >= amount; }
         )) {
-            break;
+            // prevent here
+            int t_id = ;
+            bool enough = true;
+            std::map<RESOURCE, int> res = this->required_amount[t_id];
+            std::map <RESOURCE, int>::iterator it;
+            it = res.begin();
+            while (it != res.end()) {
+            // whether enough
+                if (it->second > this->resource_amount[it->first]) {
+                    enough = false;
+                }
+            it++;
+            }
+            if (enough) {
+                break;
+            } else {
+                // sleep
+                continue;
+            }
         } else {
             auto this_id = std::this_thread::get_id();
             /* HINT: If you choose to detect the deadlock and recover,
@@ -43,6 +61,8 @@ void ResourceManager::release(RESOURCE r, int amount) {
 void ResourceManager::budget_claim(std::map<RESOURCE, int> budget) {
     // This function is called when some workload starts.
     // The workload will eventually consume all resources it claims
+    int t_id = ;// read thread id
+    this->required_amount.insert(std::map<int, std::map<RESOURCE, int>>::value_type(t_id, budget));
 }
 
 } // namespace: proj2

@@ -14,6 +14,10 @@ public:
 	Boat();
     ~Boat(){};
 	void begin(int, int, BoatGrader*);
+private:
+	std::mutex mtx;
+	std::mutex bt;
+	int position;
 };
 }
 

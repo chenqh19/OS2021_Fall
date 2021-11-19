@@ -32,3 +32,25 @@ void Boat:: begin(int a, int b, BoatGrader *bg){
     }
 } 
 }
+
+void Boat::Child() {
+
+
+    mtx.lock();
+    if (position == 1 || (position == 2 && childrenLeft >= 2)) {
+        position -= 1;
+        ChildRideToMolokai();
+    } else if (adultsLeft == 0) {
+        ChildRowToMolokai();
+    }
+    mtx.unlock();
+}
+
+void Boat::Adult() {
+    mtx.lock();
+    if (position == 2 && childrenLeft < 2) {
+        position -= 2;
+        AdultRideToMolokai();
+    }
+    mtx.unlock();
+}

@@ -147,7 +147,6 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 
 void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, int &curr_iter, int &curr_thread){
     if(inst.order == 1){
-        std::cout<<"2"<<std::endl;
         int iter_idx = inst.payloads[3];
         while (iter_idx > (signed)curr_iter) {
             Sleep(1);
@@ -167,7 +166,6 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
         mtx1->unlock(); 
     }
     else {
-        std::cout<<"1"<<std::endl;
         int iter_idx = inst.payloads[1];
         while (iter_idx > (signed)curr_iter) {
             Sleep(1);
@@ -186,7 +184,6 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
 
 int main(int argc, char* argv[]) {
 
-    std::cout<<"5"<<std::endl;
     
     std::vector<unsigned> lock1;
     std::vector<unsigned> lock2;
@@ -205,7 +202,6 @@ int main(int argc, char* argv[]) {
     proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q4.in");
     proj1::Instructions instructions = proj1::read_instructrions("data/q4_instruction.tsv");
     {
-        std::cout<<"4"<<std::endl;
         proj1::AutoTimer timer("q4");  // using this to print out timing of the block
         // Run all the instructions
         for (proj1::Instruction inst : instructions) {
@@ -219,7 +215,6 @@ int main(int argc, char* argv[]) {
             curr_iter = iter_idx;
             curr_thread ++;
             mtx1->unlock();*/
-            std::cout<<"3"<<std::endl;
             if(inst.order == 1){
                 
                 instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread)));

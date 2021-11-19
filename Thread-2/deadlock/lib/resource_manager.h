@@ -2,6 +2,7 @@
 #define DEADLOCK_LIB_RESOURCE_MANAGER_H_
 
 #include <map>
+#include <vector>
 #include <mutex>
 #include <thread>
 #include <condition_variable>
@@ -27,6 +28,7 @@ private:
     std::map<RESOURCE, int> resource_amount;
     std::map<RESOURCE, std::mutex> resource_mutex;
     std::map<RESOURCE, std::condition_variable> resource_cv;
+    std::map<int, std::map<RESOURCE, int>> required_amount;
     ThreadManager *tmgr;
     // std::map<PROCESS, std::map<RESOURCE, int>> resource_max;
     // std::map<PROCESS, std::map<RESOURCE, int>> resource_allocation;
