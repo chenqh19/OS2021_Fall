@@ -70,7 +70,8 @@ namespace proj2 {
     /* AdultRowToMolokai should be called when a adult pilots the boat
        from Oahu to Molokai */
     void BoatGrader:: AdultRowToMolokai() {
-    	boatAssert(adults_on_oahu > 0 && boat_on_oahu && adultInit > 0, "wrong Adult rowing to Molokai.\n", CONDITION_MISMATCH);
+    	//std::cout<<adults_on_oahu<<" "<<boat_on_oahu<<" "<<adultInit<<std::endl;
+        boatAssert(adults_on_oahu > 0 && boat_on_oahu == true && adultInit > 0, "wrong Adult rowing to Molokai.\n", CONDITION_MISMATCH);
         adults_on_oahu--;
         adults_on_molokai++;
         boat_on_oahu = false;
