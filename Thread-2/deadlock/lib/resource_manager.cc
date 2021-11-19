@@ -16,9 +16,9 @@ int ResourceManager::request(RESOURCE r, int amount) {
             [this, r, amount] { return this->resource_amount[r] >= amount; }
         )) {
             // prevent here
-            int t_id = ;
+            auto this_id = std::this_thread::get_id();
             bool enough = true;
-            std::map<RESOURCE, int> res = this->required_amount[t_id];
+            std::map<RESOURCE, int> res = this->required_amount[this_id];
             std::map <RESOURCE, int>::iterator it;
             it = res.begin();
             while (it != res.end()) {
@@ -29,9 +29,19 @@ int ResourceManager::request(RESOURCE r, int amount) {
             it++;
             }
             if (enough) {
+                if (can_request != this_id) {
+                    if (can_request != -1) {  
+                        continue;
+                    } else {
+                        can_request = this_id;
+                    }
+                }
                 break;
             } else {
                 // sleep
+                if (can_request == this_id) {
+                    can_request = -1;
+                }
                 continue;
             }
         } else {
@@ -47,6 +57,7 @@ int ResourceManager::request(RESOURCE r, int amount) {
         }
     }
     this->resource_amount[r] -= amount;
+    this->required_amount[this_id][r] -= amount;
     this->resource_mutex[r].unlock();
     return 0;
 }
@@ -61,8 +72,8 @@ void ResourceManager::release(RESOURCE r, int amount) {
 void ResourceManager::budget_claim(std::map<RESOURCE, int> budget) {
     // This function is called when some workload starts.
     // The workload will eventually consume all resources it claims
-    int t_id = ;// read thread id
-    this->required_amount.insert(std::map<int, std::map<RESOURCE, int>>::value_type(t_id, budget));
+    auto this_id = std::this_thread::get_id();// read thread id
+    this->required_amount.insert(std::map<int, std::map<RESOURCE, int>>::value_type(this_id, budget));
 }
 
 } // namespace: proj2

@@ -30,6 +30,7 @@ private:
     std::map<RESOURCE, std::condition_variable> resource_cv;
     std::map<int, std::map<RESOURCE, int>> required_amount;
     ThreadManager *tmgr;
+    int can_request;
     // std::map<PROCESS, std::map<RESOURCE, int>> resource_max;
     // std::map<PROCESS, std::map<RESOURCE, int>> resource_allocation;
     // std::map<PROCESS, std::map<RESOURCE, int>> resource_need;
