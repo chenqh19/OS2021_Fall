@@ -67,6 +67,10 @@ void ResourceManager::release(RESOURCE r, int amount) {
     std::unique_lock<std::mutex> lk(this->resource_mutex[r]);
     this->resource_amount[r] += amount;
     this->resource_cv[r].notify_all();
+    this->running -= 1;
+    if (this->running == 0) {
+        can_request = -1;
+    }
 }
 
 void ResourceManager::budget_claim(std::map<RESOURCE, int> budget) {
