@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
 
 namespace proj1 {
 
+bool inplace = false;
+
 void para_cold_start(EmbeddingGradient ** gradient, Embedding* user, Embedding* item) {
     EmbeddingGradient* g = cold_start(user, item);
     *gradient = g;
@@ -118,33 +120,93 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                     Sleep(1);
                 }
             } while (flag == 1);
+            
             Embedding* user = users->get_embedding(user_idx);
             Embedding* item = items->get_embedding(item_idx);
-            EmbeddingGradient* gradient = calc_gradient(user, item, label);
+            EmbeddingGradient* gradient = calc_gradient(uc, ic, label);
             users->update_embedding(user_idx, gradient, 0.01);
-            delete gradient;
-            gradient = calc_gradient(item, user, label);
-            items->update_embedding(item_idx, gradient, 0.001);
-            delete gradient;
+            Embedding* uc = new Embedding(users->get_embedding(user_idx));
+            // remove lock earlier
             mtx2->lock();
             std::remove(lock1.begin(),lock1.end(),user_idx);
+            mtx2->unlock();
+            delete gradient;
+            gradient = calc_gradient(item, uc, label);
+            items->update_embedding(item_idx, gradient, 0.001);
+            delete gradient;
+            delete uc;
+            mtx2->lock();
             std::remove(lock2.begin(),lock2.end(),item_idx);
             mtx2->unlock();
-
             break;
         }
         case RECOMMEND: {
             int user_idx = inst.payloads[0];
-            Embedding* user = users->get_embedding(user_idx);
-            std::vector<Embedding*> item_pool;
-            int iter_idx = inst.payloads[1];
-            for (unsigned int i = 2; i < inst.payloads.size(); ++i) {
-                int item_idx = inst.payloads[i];
-                item_pool.push_back(items->get_embedding(item_idx));
+            bool flag = 0;
+            do {
+                mtx2->lock();
+                for (int i = 0; i < lock1.size(); i++) {
+                    if (user_idx == lock1[i]) {
+                        flag = 1;
+                    }
+                }
+                for (int item_index : inst.payloads) {
+                    for (int i = 0; i < lock2.size(); i++) {
+                        if (item_index == lock2[i]) {
+                            flag = 1;
+                        }
+                    }
+                }
+                if (flag == 0) {
+                    for (int item_index : inst.payloads) {
+                        lock2.push_back(item_index);
+                    }
+                    lock1.push_back(user_idx);
+                } 
+                mtx2->unlock();
+                if (flag == 1) {
+                    Sleep(1);
+                }
+            } while (flag == 1);
+            if (!inplace) {
+                Embedding* user = users->get_embedding(user_idx);
+                Embedding* uc = new Embedding(user);
+                mtx2->lock();
+                std::remove(lock1.begin(),lock1.end(),user_idx);
+                mtx2->unlock();
+                std::vector<Embedding*> item_pool;
+                int iter_idx = inst.payloads[1];
+                for (unsigned int i = 2; i < inst.payloads.size(); ++i) {
+                    int item_idx = inst.payloads[i];
+                    item_pool.push_back(items->get_embedding(item_idx));
+                }
+                mtx2->lock();
+                for (int item_index : inst.payloads) {
+                    std::remove(lock2.begin(),lock2.end(),item_index);
+                }
+                mtx2->unlock();
+                Embedding* recommendation = recommend(uc, item_pool);
+                delete uc;
+                recommendation->write_to_stdout();
+                break;
+            } else {
+                Embedding* user = users->get_embedding(user_idx);
+                std::vector<Embedding*> item_pool;
+                int iter_idx = inst.payloads[1];
+                for (unsigned int i = 2; i < inst.payloads.size(); ++i) {
+                    int item_idx = inst.payloads[i];
+                    item_pool.push_back(items->get_embedding(item_idx));
+                }
+                Embedding* recommendation = recommend(user, item_pool);
+                mtx2->lock();
+                std::remove(lock1.begin(),lock1.end(),user_idx);
+                for (int item_index : inst.payloads) {
+                    std::remove(lock2.begin(),lock2.end(),item_index);
+                }
+                mtx2->unlock();
+                recommendation->write_to_stdout();
+                break;
             }
-            Embedding* recommendation = recommend(user, item_pool);
-            recommendation->write_to_stdout();
-            break;
         }
     }
 
@@ -167,12 +229,12 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
         curr_thread --;
         if(curr_thread == 0){
             curr_iter += 1;
-            std::vector<Embedding*> udata = users->; // copy
-            proj1::EmbeddingHolder* uc = new proj1::EmbeddingHolder(udata);
-            std::vector<Embedding*> idata = users->; // copy
-            proj1::EmbeddingHolder* ic = new proj1::EmbeddingHolder(idata);
-            usercopy.push_back(uc);
-            usercopy.push_back(ic);
+            // std::vector<Embedding*> udata = users->; // copy
+            // proj1::EmbeddingHolder* uc = new proj1::EmbeddingHolder(udata);
+            // std::vector<Embedding*> idata = users->; // copy
+            // proj1::EmbeddingHolder* ic = new proj1::EmbeddingHolder(idata);
+            // usercopy.push_back(uc);
+            // usercopy.push_back(ic);
             
         }
         mtx1->unlock(); 
@@ -195,7 +257,6 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
 
 
 int main(int argc, char* argv[]) {
-
     
     std::vector<unsigned> lock1;
     std::vector<unsigned> lock2;
