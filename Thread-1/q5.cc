@@ -150,7 +150,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
 
 }
 
-void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, int &curr_iter, int &curr_thread){
+void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, EmbeddingHolder* items, std::mutex* mtx1, std::mutex* mtx2, std::vector<unsigned> lock1, std::vector<unsigned> lock2, std::mutex* mtx, int &curr_iter, int &curr_thread, std::vector<proj1::EmbeddingHolder*> usercopy, std::vector<proj1::EmbeddingHolder*> itemcopy){
     if(inst.order == 1){
         int iter_idx = inst.payloads[3];
         while (iter_idx > (signed)curr_iter) {
@@ -167,6 +167,13 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
         curr_thread --;
         if(curr_thread == 0){
             curr_iter += 1;
+            std::vector<Embedding*> udata = users->; // copy
+            proj1::EmbeddingHolder* uc = new proj1::EmbeddingHolder(udata);
+            std::vector<Embedding*> idata = users->; // copy
+            proj1::EmbeddingHolder* ic = new proj1::EmbeddingHolder(idata);
+            usercopy.push_back(uc);
+            usercopy.push_back(ic);
+            
         }
         mtx1->unlock(); 
     }
@@ -205,8 +212,8 @@ int main(int argc, char* argv[]) {
     std::vector<proj1::Instruction> inst_queue;
     proj1::EmbeddingHolder* users = new proj1::EmbeddingHolder("data/q4.in");
     proj1::EmbeddingHolder* items = new proj1::EmbeddingHolder("data/q4.in");
-    std::vector<proj1::EmbeddingHolder> usercopy;
-    std::vector<proj1::EmbeddingHolder> itemcopy;
+    std::vector<proj1::EmbeddingHolder*> usercopy;
+    std::vector<proj1::EmbeddingHolder*> itemcopy;
     proj1::Instructions instructions = proj1::read_instructrions("data/q4_instruction.tsv");
     {
         proj1::AutoTimer timer("q4");  // using this to print out timing of the block
@@ -224,14 +231,14 @@ int main(int argc, char* argv[]) {
             mtx1->unlock();*/
             if(inst.order == 1){
                 
-                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread)));
+                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread), usercopy, itemcopy));
 
             }
             else if (inst.order == 0){
                 instru.push_back(std::thread(proj1::run_one_instruction, inst, users, items, mtx1, mtx2, lock1, lock2, mtx));
             }
             else{
-                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread)));
+                instru.push_back(std::thread(proj1::run_one_instruction_iter, inst, users, items, mtx1, mtx2, lock1, lock2, mtx, std::ref(curr_iter), std::ref(curr_thread), usercopy, itemcopy));
 
             }
            
