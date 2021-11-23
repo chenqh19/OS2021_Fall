@@ -6,6 +6,8 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include <algorithm>
+#include <unistd.h>
 #include "thread_manager.h"
 
 namespace proj2 {
@@ -30,7 +32,7 @@ private:
     std::map<RESOURCE, std::condition_variable> resource_cv;
     std::map<int, std::map<RESOURCE, int>> required_amount;
     ThreadManager *tmgr;
-    int can_request ; // which process is requesting
+    std::vector<int> can_request; // which processes are able to request
     int running; // how many requests are allowed to run but not finished
     
 };

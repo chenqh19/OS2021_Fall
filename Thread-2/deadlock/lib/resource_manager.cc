@@ -1,6 +1,8 @@
 #include <mutex>
 #include <thread>
 #include <chrono>
+#include <algorithm>
+#include <unistd.h>
 #include <condition_variable>
 #include "resource_manager.h"
 
@@ -29,23 +31,20 @@ int ResourceManager::request(RESOURCE r, int amount) {
                 }
             it++;
             }
-            can_request = -1;
+            if (std::find(can_request.begin(), can_request.end(), this_id) != can_request.end()) {
+                break;
+            }
             if (enough) {
-                if (can_request != this_id) {
-                    if (can_request != -1) {  
-                        continue;
-                    } else {
-                        can_request = this_id;
-                    }
+                can_request.push_back(this_id);
+                it = res.begin();
+                while (it != res.end()) {
+                    this->resource_amount[it->first] -= it->second;
+                it++;
                 }
                 break;
-            } else {
-                // sleep
-                if (can_request == this_id) {
-                    can_request = -1;
-                }
-                continue;
             }
+            usleep(1000);    
+            continue;
         } else {
             auto this_id = std::this_thread::get_id();
             /* HINT: If you choose to detect the deadlock and recover,
@@ -58,11 +57,11 @@ int ResourceManager::request(RESOURCE r, int amount) {
             }
         }
     }
-    this->resource_amount[r] -= amount;
+    // this->resource_amount[r] -= amount;
     //增加了两句，不然没定义this_id
-    auto this_id_1 = std::this_thread::get_id();
-    unsigned int this_id = *(unsigned int*)&this_id_1;
-    this->required_amount[this_id][r] -= amount;
+    // auto this_id_1 = std::this_thread::get_id();
+    // unsigned int this_id = *(unsigned int*)&this_id_1;
+    // this->required_amount[this_id][r] -= amount;
     this->resource_mutex[r].unlock();
     return 0;
 }
@@ -72,10 +71,10 @@ void ResourceManager::release(RESOURCE r, int amount) {
     std::unique_lock<std::mutex> lk(this->resource_mutex[r]);
     this->resource_amount[r] += amount;
     this->resource_cv[r].notify_all();
-    this->running -= 1;
-    if (this->running == 0) {
-        can_request = -1;
-    }
+    // this->running -= 1;
+    // if (this->running == 0) {
+    //     can_request = -1;
+    // }
 }
 
 void ResourceManager::budget_claim(std::map<RESOURCE, int> budget) {
