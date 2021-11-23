@@ -9,14 +9,15 @@ namespace proj2 {
 int ResourceManager::request(RESOURCE r, int amount) {
     if (amount <= 0)  return 1;
 
-    std::unique_lock<std::mutex> lk(this->resource_mutex[r]);
+    std::unique_lock<std::mutex> lk(this->resource_mutex[r]);//已经对resource_mutex[r]上锁了
     while (true) {
         if (this->resource_cv[r].wait_for(
             lk, std::chrono::milliseconds(100),
             [this, r, amount] { return this->resource_amount[r] >= amount; }
         )) {
             // prevent here
-            auto this_id = std::this_thread::get_id();
+            auto this_id_1 = std::this_thread::get_id();
+            unsigned int this_id = *(unsigned int*)&this_id_1;//把std::thread::id转换为int,不一定对
             bool enough = true;
             std::map<RESOURCE, int> res = this->required_amount[this_id];
             std::map <RESOURCE, int>::iterator it;
@@ -28,6 +29,7 @@ int ResourceManager::request(RESOURCE r, int amount) {
                 }
             it++;
             }
+            can_request = -1;
             if (enough) {
                 if (can_request != this_id) {
                     if (can_request != -1) {  
@@ -57,6 +59,9 @@ int ResourceManager::request(RESOURCE r, int amount) {
         }
     }
     this->resource_amount[r] -= amount;
+    //增加了两句，不然没定义this_id
+    auto this_id_1 = std::this_thread::get_id();
+    unsigned int this_id = *(unsigned int*)&this_id_1;
     this->required_amount[this_id][r] -= amount;
     this->resource_mutex[r].unlock();
     return 0;
@@ -76,7 +81,8 @@ void ResourceManager::release(RESOURCE r, int amount) {
 void ResourceManager::budget_claim(std::map<RESOURCE, int> budget) {
     // This function is called when some workload starts.
     // The workload will eventually consume all resources it claims
-    auto this_id = std::this_thread::get_id();// read thread id
+    auto this_id_1 = std::this_thread::get_id();// read thread id
+    unsigned int this_id = *(unsigned int*)&this_id_1;//把std::thread::id转换为int,不一定对
     this->required_amount.insert(std::map<int, std::map<RESOURCE, int>>::value_type(this_id, budget));
 }
 
