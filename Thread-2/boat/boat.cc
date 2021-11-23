@@ -1,7 +1,7 @@
 #include <thread>
 #include <vector>
 #include <unistd.h>
-#include <windows.h>
+#include <algorithm>
 
 
 #include "boat.h"
@@ -12,7 +12,7 @@ void Boat::AdultInitialize(BoatGrader *bg){
     
     bg->initializeAdult();
     adults_on_oahu += 1;
-    Sleep(100);
+    usleep(100000);
     std::unique_lock<std::mutex> lk(m);
     cv1.wait(lk);
     bg->AdultRowToMolokai();
@@ -34,7 +34,7 @@ void Boat::ChildInitialize(BoatGrader *bg){
     
     bg->initializeChild();
     children_on_oahu +=1;
-    Sleep(100);
+    usleep(100000);
     bool current_on_oahu = true;
     while(!finished){
         if(current_on_oahu){
@@ -127,9 +127,9 @@ void Boat:: begin(int a, int b, BoatGrader *bg){
     for(int i = 0 ; i < b; i++){
         people.push_back(new std::thread(&proj2::Boat::ChildInitialize, this, bg));
     }
-    Sleep(1000);
+    sleep(1);
     cv3.notify_one();
-    Sleep(1000);
+    sleep(1);
     
 } 
 }
