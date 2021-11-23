@@ -34,7 +34,6 @@ private:
     ThreadManager *tmgr;
     std::vector<int> can_request; // which processes are able to request
     int running; // how many requests are allowed to run but not finished
-    
 };
 
 }  // namespce: proj2
