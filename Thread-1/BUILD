@@ -38,7 +38,8 @@ cc_binary(
     copts = [
         "-std=c++11",
     ],
-    data = glob(["data/q0*"]),
+    linkopts = ["-pthread"],
+    data = glob(["data/q1*"]),
 )
 
 cc_binary(
@@ -55,6 +56,7 @@ cc_binary(
     copts = [
         "-std=c++11",
     ],
+    linkopts = ["-pthread"],
     data = glob(["data/q2*"]),
 )
 
@@ -72,6 +74,7 @@ cc_binary(
     copts = [
         "-std=c++11",
     ],
+    linkopts = ["-pthread"],
     data = glob(["data/q3*"]),
 )
 
@@ -89,8 +92,28 @@ cc_binary(
     copts = [
         "-std=c++11",
     ],
+    linkopts = ["-pthread"],
     data = glob(["data/q4*"]),
 )
+
+cc_binary(
+    name = "q5",
+    srcs = [
+        "q5.cc"
+            ],
+    deps = [
+        "//lib:embedding_lib",
+        "//lib:instruction_lib",
+        "//lib:utils_lib",
+        "//lib:model_lib"
+    ],
+    copts = [
+        "-std=c++11",
+    ],
+    linkopts = ["-pthread"],
+    data = glob(["data/q4*"]),
+)
+
 
 cc_test(
   name = "benchmark",
@@ -103,5 +126,6 @@ cc_test(
         "-O3",
         "-std=c++11",
   ],
+    linkopts = ["-pthread"],
   data = glob(["data/*"]),
 )

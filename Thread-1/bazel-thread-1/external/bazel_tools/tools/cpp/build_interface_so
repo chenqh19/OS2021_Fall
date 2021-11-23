@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash
 
 if [[ $# != 2 ]]; then
    echo "Usage: $0 <so> <interface so>" 1>&2

@@ -1,7 +1,4 @@
 #include <iostream> // cout, endl
-int main(int argc, char *argv[]) {
-    exit(1);
-}
 
 #include <vector>
 #include <tuple>
@@ -11,8 +8,9 @@ int main(int argc, char *argv[]) {
 #include <iostream> // cout, endl
 #include <mutex>
 #include <vector>
-#include <windows.h>
+#include <unistd.h>
 #include <thread>
+#include <algorithm>
 
 #include "lib/utils.h"
 #include "lib/model.h" 
@@ -61,7 +59,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 } 
                 mtx2->unlock();
                 if (flag == 1) {
-                    Sleep(1);
+                    usleep(1000);
                 }
             } while (flag == 1);
             std::vector<EmbeddingGradient*> gradient_vec(inst.payloads.size());
@@ -117,13 +115,13 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 } 
                 mtx2->unlock();
                 if (flag == 1) {
-                    Sleep(1);
+                    usleep(1000);
                 }
             } while (flag == 1);
             
             Embedding* user = users->get_embedding(user_idx);
             Embedding* item = items->get_embedding(item_idx);
-            EmbeddingGradient* gradient = calc_gradient(uc, ic, label);
+            EmbeddingGradient* gradient = calc_gradient(user, item, label);
             users->update_embedding(user_idx, gradient, 0.01);
             Embedding* uc = new Embedding(users->get_embedding(user_idx));
             // remove lock earlier
@@ -150,22 +148,24 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                         flag = 1;
                     }
                 }
-                for (int item_index : inst.payloads) {
+                for (unsigned int i = 2; i < inst.payloads.size(); ++i) {
+                    int item_idx = inst.payloads[i];
                     for (int i = 0; i < lock2.size(); i++) {
-                        if (item_index == lock2[i]) {
+                        if (item_idx == lock2[i]) {
                             flag = 1;
                         }
                     }
                 }
                 if (flag == 0) {
-                    for (int item_index : inst.payloads) {
-                        lock2.push_back(item_index);
+                    for (unsigned int i = 2; i < inst.payloads.size(); ++i) {
+                    int item_idx = inst.payloads[i];
+                        lock2.push_back(item_idx);
                     }
                     lock1.push_back(user_idx);
                 } 
                 mtx2->unlock();
                 if (flag == 1) {
-                    Sleep(1);
+                    usleep(1000);
                 }
             } while (flag == 1);
             if (!inplace) {
@@ -181,8 +181,9 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                     item_pool.push_back(items->get_embedding(item_idx));
                 }
                 mtx2->lock();
-                for (int item_index : inst.payloads) {
-                    std::remove(lock2.begin(),lock2.end(),item_index);
+                for (unsigned int i = 2; i < inst.payloads.size(); ++i) {
+                    int item_idx = inst.payloads[i];
+                    std::remove(lock2.begin(),lock2.end(),item_idx);
                 }
                 mtx2->unlock();
                 Embedding* recommendation = recommend(uc, item_pool);
@@ -200,8 +201,9 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 Embedding* recommendation = recommend(user, item_pool);
                 mtx2->lock();
                 std::remove(lock1.begin(),lock1.end(),user_idx);
-                for (int item_index : inst.payloads) {
-                    std::remove(lock2.begin(),lock2.end(),item_index);
+                for (unsigned int i = 2; i < inst.payloads.size(); ++i) {
+                    int item_idx = inst.payloads[i];
+                    std::remove(lock2.begin(),lock2.end(),item_idx);
                 }
                 mtx2->unlock();
                 recommendation->write_to_stdout();
@@ -216,7 +218,7 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
     if(inst.order == 1){
         int iter_idx = inst.payloads[3];
         while (iter_idx > (signed)curr_iter) {
-            Sleep(1);
+            usleep(1000);
         }
         mtx1->lock();
         curr_iter = iter_idx;
@@ -242,7 +244,7 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
     else {
         int iter_idx = inst.payloads[1];
         while (iter_idx > (signed)curr_iter) {
-            Sleep(1);
+            usleep(1000);
         }
         run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
         

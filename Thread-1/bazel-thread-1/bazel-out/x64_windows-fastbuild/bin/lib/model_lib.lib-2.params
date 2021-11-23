@@ -1,5 +1,0 @@
-/nologo
-/OUT:bazel-out/x64_windows-fastbuild/bin/lib/model_lib.lib
-/MACHINE:X64
-bazel-out/x64_windows-fastbuild/bin/lib/_objs/model_lib/model.obj
-/ignore:4221

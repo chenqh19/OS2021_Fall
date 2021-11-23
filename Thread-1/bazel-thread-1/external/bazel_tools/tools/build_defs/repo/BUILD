@@ -1,5 +1,3 @@
-exports_files(glob(["*.bzl"]))
-
 filegroup(
     name = "bzl_srcs",
     srcs = glob(["*.bzl"]),

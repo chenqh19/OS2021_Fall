@@ -153,12 +153,12 @@ string CreateTempDir(const std::string &prefix) {
 
 static bool RemoveDirRecursively(const std::string &path) {
   DIR *dir;
-  if ((dir = opendir(path.c_str())) == nullptr) {
+  if ((dir = opendir(path.c_str())) == NULL) {
     return false;
   }
 
   struct dirent *ent;
-  while ((ent = readdir(dir)) != nullptr) {
+  while ((ent = readdir(dir)) != NULL) {
     if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
       continue;
     }
@@ -354,8 +354,8 @@ bool PathExists(const string& path) {
 bool PathExists(const Path &path) { return PathExists(path.AsNativePath()); }
 
 string MakeCanonical(const char *path) {
-  char *resolved_path = realpath(path, nullptr);
-  if (resolved_path == nullptr) {
+  char *resolved_path = realpath(path, NULL);
+  if (resolved_path == NULL) {
     return "";
   } else {
     string ret = resolved_path;
@@ -476,10 +476,10 @@ bool PosixFileMtime::Set(const Path &path, const struct utimbuf &mtime) {
 }
 
 time_t PosixFileMtime::GetNow() {
-  time_t result = time(nullptr);
+  time_t result = time(NULL);
   if (result == -1) {
     BAZEL_DIE(blaze_exit_code::INTERNAL_ERROR)
-        << "time(nullptr) failed: " << GetLastErrorString();
+        << "time(NULL) failed: " << GetLastErrorString();
   }
   return result;
 }
@@ -506,7 +506,7 @@ bool MakeDirectories(const Path &path, unsigned int mode) {
 
 string GetCwd() {
   char cwdbuf[PATH_MAX];
-  if (getcwd(cwdbuf, sizeof cwdbuf) == nullptr) {
+  if (getcwd(cwdbuf, sizeof cwdbuf) == NULL) {
     BAZEL_DIE(blaze_exit_code::INTERNAL_ERROR)
         << "getcwd() failed: " << GetLastErrorString();
   }
@@ -522,12 +522,12 @@ void ForEachDirectoryEntry(const string &path,
   DIR *dir;
   struct dirent *ent;
 
-  if ((dir = opendir(path.c_str())) == nullptr) {
+  if ((dir = opendir(path.c_str())) == NULL) {
     // This is not a directory or it cannot be opened.
     return;
   }
 
-  while ((ent = readdir(dir)) != nullptr) {
+  while ((ent = readdir(dir)) != NULL) {
     if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
       continue;
     }
@@ -551,7 +551,7 @@ void ForEachDirectoryEntry(const string &path,
       }
 
       consume->Consume(filename, is_directory);
-  }
+    }
 
     closedir(dir);
   }

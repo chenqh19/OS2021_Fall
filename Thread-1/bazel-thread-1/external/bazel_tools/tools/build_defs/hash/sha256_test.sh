@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash
 
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #

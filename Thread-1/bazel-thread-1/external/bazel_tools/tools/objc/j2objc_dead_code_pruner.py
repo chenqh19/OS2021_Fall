@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/nix/store/8dxxjbiyxwkvh53q5kh6nydla2anacgi-python3-3.9.6/bin/python
 
 # Copyright 2015 The Bazel Authors. All rights reserved.
 #
@@ -30,13 +30,11 @@ from collections import OrderedDict
 import multiprocessing
 import os
 import pipes  # swap to shlex once on Python 3
+import Queue
 import re
 import shutil
 import subprocess
 import threading
-
-from six.moves import queue as Queue  # pylint: disable=redefined-builtin
-from six.moves import xrange  # pylint: disable=redefined-builtin
 
 PRUNED_SRC_CONTENT = 'static int DUMMY_unused __attribute__((unused,used)) = 0;'
 

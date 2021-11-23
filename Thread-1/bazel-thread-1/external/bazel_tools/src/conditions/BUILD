@@ -1,110 +1,102 @@
 config_setting(
     name = "freebsd",
-    constraint_values = ["@platforms//os:freebsd"],
+    values = {"cpu": "freebsd"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "openbsd",
-    constraint_values = ["@platforms//os:openbsd"],
+    values = {"cpu": "openbsd"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "darwin",
-    constraint_values = ["@platforms//os:macos"],
+    values = {"cpu": "darwin"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "linux_ppc",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:ppc",
-    ],
+    values = {"cpu": "ppc"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "linux_ppc64le",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:ppc",
-    ],
+    values = {"cpu": "ppc"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "linux_s390x",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:s390x",
-    ],
+    values = {"cpu": "s390x"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "linux_x86_64",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
-    ],
+    values = {"cpu": "k8"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "linux_aarch64",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:aarch64",
-    ],
+    values = {"cpu": "aarch64"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "darwin_x86_64",
-    constraint_values = [
-        "@platforms//os:macos",
-        "@platforms//cpu:x86_64",
-    ],
+    values = {"cpu": "darwin_x86_64"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "darwin_arm64",
-    constraint_values = [
-        "@platforms//os:macos",
-        "@platforms//cpu:arm64",
-    ],
+    values = {"cpu": "darwin_arm64"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "darwin_arm64e",
-    constraint_values = [
-        "@platforms//os:macos",
-        "@platforms//cpu:arm64e",
-    ],
+    values = {"cpu": "darwin_arm64e"},
     visibility = ["//visibility:public"],
 )
 
 config_setting(
     name = "windows",
-    constraint_values = ["@platforms//os:windows"],
+    values = {"cpu": "x64_windows"},
     visibility = ["//visibility:public"],
 )
 
-# TODO: figure out how to base this selection on constraints
 config_setting(
     name = "windows_msvc",
     values = {"cpu": "x64_windows_msvc"},
     visibility = ["//visibility:public"],
 )
 
-# TODO: figure out how to base this selection on constraints
+config_setting(
+    name = "windows_msys",
+    values = {"cpu": "x64_windows_msys"},
+    visibility = ["//visibility:public"],
+)
+
 config_setting(
     name = "host_windows",
     values = {"host_cpu": "x64_windows"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "host_windows_msvc",
+    values = {"host_cpu": "x64_windows_msvc"},
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "host_windows_msys",
+    values = {"host_cpu": "x64_windows_msys"},
     visibility = ["//visibility:public"],
 )
 

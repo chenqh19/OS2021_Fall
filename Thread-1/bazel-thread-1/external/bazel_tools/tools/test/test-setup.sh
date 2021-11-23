@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash
 
 # Copyright 2015 The Bazel Authors. All rights reserved.
 #
@@ -361,7 +361,7 @@ wait $childPid
 # By this point, we have everything we're willing to wait for. Tidy up our own
 # processes and move on.
 kill_group SIGKILL $childPid
-kill_group SIGKILL $cleanupPid &> /dev/null
+kill -SIGKILL $cleanupPid &> /dev/null
 wait $cleanupPid
 
 for signal in $signals; do

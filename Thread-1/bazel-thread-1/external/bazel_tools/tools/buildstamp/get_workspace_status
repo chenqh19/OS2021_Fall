@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash
 
 # This script will be run bazel when building process starts to
 # generate key-value information that represents the status of the

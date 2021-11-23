@@ -43,11 +43,11 @@ class LaunchDataParserTest : public ::testing::Test {
 
   void SetUp() override {
     char* tmpdir = getenv("TEST_TMPDIR");
-    if (tmpdir != nullptr) {
+    if (tmpdir != NULL) {
       test_tmpdir = string(tmpdir);
     } else {
       tmpdir = getenv("TEMP");
-      ASSERT_FALSE(tmpdir == nullptr);
+      ASSERT_FALSE(tmpdir == NULL);
       test_tmpdir = string(tmpdir);
     }
   }

@@ -1,5 +1,5 @@
-load("//tools/python:private/defs.bzl", "py_binary", "py_library")
-load(":defs.bzl", "run_ijar", "run_singlejar")
+load("//tools/python:private/defs.bzl", "py_library", "py_binary")
+load("//tools/python:private/version.bzl", "PY_BINARY_VERSION")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -106,7 +106,7 @@ alias(
         "use_d8_dexmerger": ":d8_dexmerger",
         "use_dx_dexmerger": "//src/tools/android/java/com/google/devtools/build/android/dexer:DexFileMerger",
         "//conditions:default": "//src/tools/android/java/com/google/devtools/build/android/dexer:DexFileMerger",
-    }),
+    })
 )
 
 alias(
@@ -141,16 +141,22 @@ filegroup(
 
 # javac needs this Jar to compile lambdas, method references, and type annotations.
 # These classes are not part of the android.jar.
-run_singlejar(
+genrule(
     name = "gen_java_base_extras_jar",
     srcs = [
         "@bazel_tools//tools/jdk:platformclasspath",
     ],
-    out = "java_base_extras.jar",
-    include_prefixes = [
-        "java/lang/invoke/",
-        "java/lang/annotation/",
-    ],
+    outs = ["java_base_extras.jar"],
+    cmd = """
+    $(location @bazel_tools//tools/jdk:singlejar) \
+        --exclude_build_data \
+        --dont_change_compression \
+        --sources  $(location @bazel_tools//tools/jdk:platformclasspath) \
+        --include_prefixes "java/lang/invoke/" \
+        --include_prefixes "java/lang/annotation/" \
+        --normalize \
+        --output $@""",
+    tools = ["@bazel_tools//tools/jdk:singlejar"],
     visibility = ["//visibility:private"],
 )
 
@@ -161,9 +167,12 @@ java_import(
     visibility = ["//visibility:public"],
 )
 
-run_ijar(
+genrule(
     name = "ijar_desugared_java8_legacy_libs",
-    jar = "desugared_java8_legacy_libs.jar",
+    srcs = ["desugared_java8_legacy_libs"],
+    outs = ["desugared_java8_legacy_libs-ijar.jar"],
+    cmd = "$(location @bazel_tools//tools/jdk:ijar) $< $@",
+    tools = ["@bazel_tools//tools/jdk:ijar"],
     visibility = ["//visibility:private"],
 )
 
@@ -208,15 +217,14 @@ genrule(
         --noemit_dependency_metadata_as_needed \
         --nodesugar_try_with_resources_if_needed \
         --desugar_supported_core_libs \
-        --rewrite_core_library_prefix java/time/ \
         --rewrite_core_library_prefix java/lang/Double8 \
         --rewrite_core_library_prefix java/lang/Integer8 \
         --rewrite_core_library_prefix java/lang/Long8 \
         --rewrite_core_library_prefix java/lang/Math8 \
-        --rewrite_core_library_prefix java/io/Desugar \
-        --rewrite_core_library_prefix java/io/UncheckedIOException \
+        --rewrite_core_library_prefix java/time/ \
         --rewrite_core_library_prefix java/util/stream/ \
         --rewrite_core_library_prefix java/util/function/ \
+        --rewrite_core_library_prefix java/util/Comparators \
         --rewrite_core_library_prefix java/util/Desugar \
         --rewrite_core_library_prefix java/util/DoubleSummaryStatistics \
         --rewrite_core_library_prefix java/util/IntSummaryStatistics \
@@ -224,13 +232,15 @@ genrule(
         --rewrite_core_library_prefix java/util/Objects \
         --rewrite_core_library_prefix java/util/Optional \
         --rewrite_core_library_prefix java/util/PrimitiveIterator \
+        --rewrite_core_library_prefix java/util/SortedSet\\$$1 \
         --rewrite_core_library_prefix java/util/Spliterator \
         --rewrite_core_library_prefix java/util/StringJoiner \
-        --rewrite_core_library_prefix javadesugar/testing/ \
+        --rewrite_core_library_prefix java/util/Tripwire \
         --rewrite_core_library_prefix java/util/concurrent/ConcurrentHashMap \
+        --rewrite_core_library_prefix java/util/concurrent/DesugarUnsafe \
         --rewrite_core_library_prefix java/util/concurrent/ThreadLocalRandom \
         --rewrite_core_library_prefix java/util/concurrent/atomic/DesugarAtomic \
-        --auto_desugar_shadowed_api_use \
+        --retarget_core_library_member "java/util/LinkedHashSet#spliterator->java/util/DesugarLinkedHashSet" \
         --emulate_core_library_interface java/util/Collection \
         --emulate_core_library_interface java/util/Map \
         --emulate_core_library_interface java/util/Map\\$$Entry \
@@ -267,21 +277,21 @@ alias(
 py_binary(
     name = "instrumentation_test_check",
     srcs = ["instrumentation_test_check.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = ["//third_party/py/abseil"],
 )
 
 py_binary(
     name = "build_incremental_dexmanifest",
     srcs = [":build_incremental_dexmanifest.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [],
 )
 
 py_binary(
     name = "build_split_manifest",
     srcs = ["build_split_manifest.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [
         "//third_party/py/abseil",
     ],
@@ -290,17 +300,17 @@ py_binary(
 py_binary(
     name = "incremental_install",
     srcs = ["incremental_install.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [
-        "//third_party/py/abseil",
         "//third_party/py/concurrent:futures",
+        "//third_party/py/abseil",
     ],
 )
 
 py_binary(
     name = "strip_resources",
     srcs = ["strip_resources.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [
         "//third_party/py/abseil",
     ],
@@ -311,7 +321,7 @@ py_binary(
     srcs = [
         "aar_native_libs_zip_creator.py",
     ],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [
         ":junction_lib",
         "//third_party/py/abseil",
@@ -321,18 +331,8 @@ py_binary(
 py_binary(
     name = "stubify_manifest",
     srcs = ["stubify_manifest.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [
-        "//third_party/py/abseil",
-    ],
-)
-
-py_binary(
-    name = "aar_embedded_proguard_extractor",
-    srcs = ["aar_embedded_proguard_extractor.py"],
-    python_version = "PY3",
-    deps = [
-        ":junction_lib",
         "//third_party/py/abseil",
     ],
 )
@@ -340,7 +340,7 @@ py_binary(
 py_binary(
     name = "aar_embedded_jars_extractor",
     srcs = ["aar_embedded_jars_extractor.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [
         ":junction_lib",
         "//third_party/py/abseil",
@@ -350,7 +350,7 @@ py_binary(
 py_binary(
     name = "aar_resources_extractor",
     srcs = ["aar_resources_extractor.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
     deps = [
         ":junction_lib",
         "//third_party/py/abseil",
@@ -360,7 +360,7 @@ py_binary(
 py_binary(
     name = "resource_extractor",
     srcs = ["resource_extractor.py"],
-    python_version = "PY3",
+    python_version = PY_BINARY_VERSION,
 )
 
 py_library(

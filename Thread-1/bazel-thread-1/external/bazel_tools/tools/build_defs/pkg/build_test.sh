@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash
 # -*- coding: utf-8 -*-
 
 # Copyright 2015 The Bazel Authors. All rights reserved.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash
 #
 # Copyright 2015 The Bazel Authors. All rights reserved.
 #
@@ -33,32 +33,19 @@ LIBS=
 LIB_DIRS=
 RPATHS=
 OUTPUT=
-
-function parse_option() {
-    local -r opt="$1"
-    if [[ "${OUTPUT}" = "1" ]]; then
-        OUTPUT=$opt
-    elif [[ "$opt" =~ ^-l(.*)$ ]]; then
-        LIBS="${BASH_REMATCH[1]} $LIBS"
-    elif [[ "$opt" =~ ^-L(.*)$ ]]; then
-        LIB_DIRS="${BASH_REMATCH[1]} $LIB_DIRS"
-    elif [[ "$opt" =~ ^-Wl,-rpath,\@loader_path/(.*)$ ]]; then
-        RPATHS="${BASH_REMATCH[1]} ${RPATHS}"
-    elif [[ "$opt" = "-o" ]]; then
-        # output is coming
-        OUTPUT=1
-    fi
-}
-
 # let parse the option list
 for i in "$@"; do
-    if [[ "$i" = @* ]]; then
-        while IFS= read -r opt
-        do
-            parse_option "$opt"
-        done < "${i:1}" || exit 1
-    else
-        parse_option "$i"
+    if [[ "${OUTPUT}" = "1" ]]; then
+        OUTPUT=$i
+    elif [[ "$i" =~ ^-l(.*)$ ]]; then
+        LIBS="${BASH_REMATCH[1]} $LIBS"
+    elif [[ "$i" =~ ^-L(.*)$ ]]; then
+        LIB_DIRS="${BASH_REMATCH[1]} $LIB_DIRS"
+    elif [[ "$i" =~ ^-Wl,-rpath,\@loader_path/(.*)$ ]]; then
+        RPATHS="${BASH_REMATCH[1]} ${RPATHS}"
+    elif [[ "$i" = "-o" ]]; then
+        # output is coming
+        OUTPUT=1
     fi
 done
 
@@ -66,7 +53,11 @@ done
 %{env}
 
 # Call the C++ compiler
-%{cc} "$@"
+if [[ ${*: -1} = "" ]]; then
+    %{cc} "${@:0:$#}"
+else
+    %{cc} "$@"
+fi
 
 function get_library_path() {
     for libdir in ${LIB_DIRS}; do

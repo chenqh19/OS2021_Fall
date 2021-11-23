@@ -21,10 +21,6 @@
 // 6,6.4,6.4.1 = 6.4.1
 // 6.3,6.3.0 = 6.3
 
-#if !defined(__has_feature) || !__has_feature(objc_arc)
-#error "This file requires ARC support."
-#endif
-
 #import <CoreServices/CoreServices.h>
 #import <Foundation/Foundation.h>
 

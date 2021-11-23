@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/nix/store/phqa311klldrcbwid1i22dwnpfc9dnma-bash-5.1-p8/bin/sh
 # Copyright 2020 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

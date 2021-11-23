@@ -1,3 +1,4 @@
+PATH=$PATH:/nix/store/phqa311klldrcbwid1i22dwnpfc9dnma-bash-5.1-p8/bin:/nix/store/qmn7m3wk8b1v1ljhb2dzyjh41d6ingp6-coreutils-9.0/bin:/nix/store/0xzqirrdxw4h9kr0sq4rp1chad5v8fg9-findutils-4.8.0/bin:/nix/store/2nxp2psvpfwgh2j0bb6kdrirn5ak36qa-gawk-5.1.0/bin:/nix/store/vcffj451l0bymy3gzkhb9hs4yk0g9yjm-gnugrep-3.7/bin:/nix/store/zxqrdg4ckws9vblws18ghm1p87xiswvv-gnutar-1.34/bin:/nix/store/d9drqi4daha3f0b6wm5y0fnabbggy1r2-gnused-4.8/bin:/nix/store/y65mab69w9m64l2fw5bg9pzkkh15add4-gzip-1.11/bin:/nix/store/3j6lxnvk9xfhfzsvv19991a0vv1sj8md-which-2.21/bin:/nix/store/8wr903yvvw0f8iny5nlg2kfkgnm5zp7i-unzip-6.0/bin:/nix/store/lm8q6pfa0mqxik7aixsrgh1nrwb6lrln-file-5.40/bin:/nix/store/6brf9crrd8ygfqk4dr7x3c127j08rcs2-zip-3.0/bin
 # Copyright 2018 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

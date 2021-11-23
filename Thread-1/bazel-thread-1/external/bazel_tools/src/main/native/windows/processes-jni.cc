@@ -52,9 +52,8 @@ class JavaByteArray {
       : env_(env),
         array_(java_array),
         size_(java_array != nullptr ? env->GetArrayLength(java_array) : 0),
-        ptr_(java_array != nullptr
-                 ? env->GetByteArrayElements(java_array, nullptr)
-                 : nullptr) {}
+        ptr_(java_array != nullptr ? env->GetByteArrayElements(java_array, NULL)
+                                   : nullptr) {}
 
   ~JavaByteArray() {
     if (array_ != nullptr) {
@@ -91,39 +90,12 @@ class NativeOutputStream {
     //
     // Therefore if this process bequested `handle_` to a child process, we
     // cannot cancel I/O in the child process.
-    CancelIoEx(handle_, nullptr);
+    CancelIoEx(handle_, NULL);
     CloseHandle(handle_);
     handle_ = INVALID_HANDLE_VALUE;
   }
 
   void SetHandle(HANDLE handle) { handle_ = handle; }
-
-  jint StreamBytesAvailable(JNIEnv* env) {
-    if (closed_.load() || handle_ == INVALID_HANDLE_VALUE) {
-      error_ = L"";
-      return 0;
-    }
-
-    DWORD avail = 0;
-    if (!::PeekNamedPipe(handle_, nullptr, 0, nullptr, &avail, nullptr)) {
-      // Check if either the other end closed the pipe or we did it with
-      // NativeOutputStream.Close() . In the latter case, we'll get a "system
-      // call interrupted" error.
-      if (GetLastError() == ERROR_BROKEN_PIPE || closed_.load()) {
-        error_ = L"";
-        return 0;
-      } else {
-        DWORD err_code = GetLastError();
-        error_ = bazel::windows::MakeErrorMessage(WSTR(__FILE__), __LINE__,
-                                                  L"nativeStreamBytesAvailable",
-                                                  L"", err_code);
-        return -1;
-      }
-    } else {
-      error_ = L"";
-    }
-    return avail;
-  }
 
   jint ReadStream(JNIEnv* env, jbyteArray java_bytes, jint offset,
                   jint length) {
@@ -141,8 +113,7 @@ class NativeOutputStream {
     }
 
     DWORD bytes_read;
-    if (!::ReadFile(handle_, bytes.ptr() + offset, length, &bytes_read,
-                    nullptr)) {
+    if (!::ReadFile(handle_, bytes.ptr() + offset, length, &bytes_read, NULL)) {
       // Check if either the other end closed the pipe or we did it with
       // NativeOutputStream.Close() . In the latter case, we'll get a "system
       // call interrupted" error.
@@ -239,7 +210,6 @@ class NativeProcess {
       }
     }
 
-    // Set up childs stdin pipe.
     {
       HANDLE pipe_read_h, pipe_write_h;
       if (!CreatePipe(&pipe_read_h, &pipe_write_h, &sa, 0)) {
@@ -250,14 +220,6 @@ class NativeProcess {
       }
       stdin_process = pipe_read_h;
       stdin_ = pipe_write_h;
-
-      // "Our" end of the pipe must not be inherited by the child process
-      if (!SetHandleInformation(pipe_write_h, HANDLE_FLAG_INHERIT, 0)) {
-        DWORD err_code = GetLastError();
-        error_ = bazel::windows::MakeErrorMessage(
-            WSTR(__FILE__), __LINE__, L"nativeCreateProcess", wpath, err_code);
-        return false;
-      }
     }
 
     if (!stdout_is_stream) {
@@ -272,7 +234,7 @@ class NativeProcess {
           /* lpSecurityAttributes */ &sa,
           /* dwCreationDisposition */ OPEN_ALWAYS,
           /* dwFlagsAndAttributes */ FILE_ATTRIBUTE_NORMAL,
-          /* hTemplateFile */ nullptr);
+          /* hTemplateFile */ NULL);
 
       if (!stdout_process.IsValid()) {
         DWORD err_code = GetLastError();
@@ -281,7 +243,7 @@ class NativeProcess {
                                                   stdout_redirect, err_code);
         return false;
       }
-      if (!SetFilePointerEx(stdout_process, {0}, nullptr, FILE_END)) {
+      if (!SetFilePointerEx(stdout_process, {0}, NULL, FILE_END)) {
         DWORD err_code = GetLastError();
         error_ = bazel::windows::MakeErrorMessage(WSTR(__FILE__), __LINE__,
                                                   L"nativeCreateProcess",
@@ -298,13 +260,6 @@ class NativeProcess {
       }
       stdout_.SetHandle(pipe_read_h);
       stdout_process = pipe_write_h;
-      // "Our" end of the pipe must not be inherited by the child process
-      if (!SetHandleInformation(pipe_read_h, HANDLE_FLAG_INHERIT, 0)) {
-        DWORD err_code = GetLastError();
-        error_ = bazel::windows::MakeErrorMessage(
-            WSTR(__FILE__), __LINE__, L"nativeCreateProcess", wpath, err_code);
-        return false;
-      }
     }
 
     if (stderr_same_handle_as_stdout) {
@@ -333,7 +288,7 @@ class NativeProcess {
           /* lpSecurityAttributes */ &sa,
           /* dwCreationDisposition */ OPEN_ALWAYS,
           /* dwFlagsAndAttributes */ FILE_ATTRIBUTE_NORMAL,
-          /* hTemplateFile */ nullptr);
+          /* hTemplateFile */ NULL);
 
       if (!stderr_process.IsValid()) {
         DWORD err_code = GetLastError();
@@ -342,7 +297,7 @@ class NativeProcess {
                                                   stderr_redirect, err_code);
         return false;
       }
-      if (!SetFilePointerEx(stderr_process, {0}, nullptr, FILE_END)) {
+      if (!SetFilePointerEx(stderr_process, {0}, NULL, FILE_END)) {
         DWORD err_code = GetLastError();
         error_ = bazel::windows::MakeErrorMessage(WSTR(__FILE__), __LINE__,
                                                   L"nativeCreateProcess",
@@ -359,13 +314,6 @@ class NativeProcess {
       }
       stderr_.SetHandle(pipe_read_h);
       stderr_process = pipe_write_h;
-      // "Our" end of the pipe must not be inherited by the child process
-      if (!SetHandleInformation(pipe_read_h, HANDLE_FLAG_INHERIT, 0)) {
-        DWORD err_code = GetLastError();
-        error_ = bazel::windows::MakeErrorMessage(
-            WSTR(__FILE__), __LINE__, L"nativeCreateProcess", wpath, err_code);
-        return false;
-      }
     }
     return proc_.Create(
         wpath, bazel::windows::GetJavaWstring(env, java_argv_rest),
@@ -403,7 +351,7 @@ class NativeProcess {
     DWORD bytes_written;
 
     if (!::WriteFile(stdin_, bytes.ptr() + offset, length, &bytes_written,
-                     nullptr)) {
+                     NULL)) {
       DWORD err_code = GetLastError();
       error_ = bazel::windows::MakeErrorMessage(WSTR(__FILE__), __LINE__,
                                                 L"NativeProcess:WriteStdin",
@@ -493,14 +441,6 @@ Java_com_google_devtools_build_lib_windows_WindowsProcesses_readStream(
   NativeOutputStream* stream =
       reinterpret_cast<NativeOutputStream*>(stream_long);
   return stream->ReadStream(env, java_bytes, offset, length);
-}
-
-extern "C" JNIEXPORT jint JNICALL
-Java_com_google_devtools_build_lib_windows_WindowsProcesses_streamBytesAvailable(
-    JNIEnv* env, jclass clazz, jlong stream_long) {
-  NativeOutputStream* stream =
-      reinterpret_cast<NativeOutputStream*>(stream_long);
-  return stream->StreamBytesAvailable(env);
 }
 
 extern "C" JNIEXPORT jint JNICALL

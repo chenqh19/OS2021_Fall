@@ -16,7 +16,7 @@
 
 load(":test_rules_private.bzl", "BASH_RUNFILES_DEP", "INIT_BASH_RUNFILES")
 
-_SH_STUB = "\n".join(["#!/bin/bash"] + INIT_BASH_RUNFILES + [
+_SH_STUB = "\n".join(["#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash"] + INIT_BASH_RUNFILES + [
     "function add_ws_name() {",
     '  [[ "$1" =~ external/* ]] && echo "${1#external/}" || echo "$TEST_WORKSPACE/$1"',
     "}",
@@ -78,7 +78,7 @@ def success_target(ctx, msg, exe = None):
     exe = exe or ctx.outputs.executable
     ctx.actions.write(
         output = exe,
-        content = "#!/bin/bash\ncat <<'__eof__'\n" + msg + "\n__eof__\necho",
+        content = "#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash\ncat <<'__eof__'\n" + msg + "\n__eof__\necho",
         is_executable = True,
     )
     return [DefaultInfo(files = depset([exe]))]
@@ -127,7 +127,7 @@ def failure_target(ctx, msg, exe = None):
     exe = exe or ctx.outputs.executable
     ctx.actions.write(
         output = exe,
-        content = "#!/bin/bash\ncat >&2 <<'__eof__'\n" + msg + "\n__eof__\nexit 1",
+        content = "#!/nix/store/pprdrvp8bjcd5cllzb5qj0zcgb10yxfa-bash/bin/bash\ncat >&2 <<'__eof__'\n" + msg + "\n__eof__\nexit 1",
         is_executable = True,
     )
     return [DefaultInfo(files = depset([exe]))]

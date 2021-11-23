@@ -81,7 +81,6 @@ def _get_tool_paths(repository_ctx, overriden_tools):
         for k in [
             "ar",
             "ld",
-            "llvm-cov",
             "cpp",
             "gcc",
             "dwp",
@@ -116,6 +115,19 @@ def _cxx_inc_convert(path):
     if path.endswith(_OSX_FRAMEWORK_SUFFIX):
         path = path[:-_OSX_FRAMEWORK_SUFFIX_LEN].strip()
     return path
+
+def get_escaped_cxx_inc_directories(repository_ctx, cc, lang_flag, additional_flags = []):
+    """Deprecated. Compute the list of %-escaped C++ include directories.
+
+    This function is no longer needed by cc_configure and is left there only for backwards
+    compatibility reasons.
+    """
+    return [escape_string(s) for s in _get_cxx_include_directories(
+        repository_ctx,
+        cc,
+        lang_flag,
+        additional_flags,
+    )]
 
 def _get_cxx_include_directories(repository_ctx, cc, lang_flag, additional_flags = []):
     """Compute the list of C++ include directories."""
@@ -335,7 +347,7 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overriden_tools):
     )
 
     repository_ctx.file("tools/cpp/empty.cc", "int main() {}")
-    darwin = cpu_value.startswith("darwin")
+    darwin = cpu_value == "darwin"
 
     cc = _find_generic(repository_ctx, "gcc", "CC", overriden_tools)
     is_clang = _is_clang(repository_ctx, cc)
@@ -345,14 +357,6 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overriden_tools):
         repository_ctx,
         "gcov",
         "GCOV",
-        overriden_tools,
-        warn = True,
-        silent = True,
-    )
-    overriden_tools["llvm-cov"] = _find_generic(
-        repository_ctx,
-        "llvm-cov",
-        "BAZEL_LLVM_COV",
         overriden_tools,
         warn = True,
         silent = True,
@@ -447,6 +451,7 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overriden_tools):
             "%{cc_toolchain_identifier}": cc_toolchain_identifier,
             "%{name}": cpu_value,
             "%{modulemap}": ("\":module.modulemap\"" if is_clang else "None"),
+            "%{supports_param_files}": "0" if darwin else "1",
             "%{cc_compiler_deps}": get_starlark_list([":builtin_include_directory_paths"] + (
                 [":cc_wrapper"] if darwin else []
             )),

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/nix/store/phqa311klldrcbwid1i22dwnpfc9dnma-bash-5.1-p8/bin/sh
 
 # Don't set -e because we don't have robust trapping and printing of errors.
 set -u

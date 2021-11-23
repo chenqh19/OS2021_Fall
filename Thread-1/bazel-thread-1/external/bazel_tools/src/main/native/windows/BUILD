@@ -27,9 +27,6 @@ cc_library(
         "file.h",
         "util.h",
     ],
-    linkopts = [
-        "-DEFAULTLIB:advapi32.lib",  # RegGetValueW
-    ],
     visibility = [
         "//src/main/cpp:__subpackages__",
         "//src/main/tools:__pkg__",
@@ -67,12 +64,25 @@ cc_binary(
         "//src/main/native:jni_md.h",
     ],
     linkshared = 1,
-    visibility = [
-        "//src/main/java/com/google/devtools/build/lib/jni:__pkg__",
-    ],
+    # :target-os-native-lib should be used outside of this package
+    visibility = ["//visibility:private"],
     deps = [
         ":lib-file",
         ":lib-process",
+    ],
+)
+
+# Platform-independent holder for native JNI libraries (empty for non-Windows systems).
+# Targets should depend on this filegroup rather then on Platform-dependent libraries directly!
+filegroup(
+    name = "target-os-native-lib",
+    srcs = select({
+        "//src/conditions:windows": ["//src/main/native/windows:windows_jni.dll"],
+        "//conditions:default": [],
+    }),
+    visibility = [
+        "//src:__pkg__",
+        "//src/main/java/com/google/devtools/build/lib/jni:__pkg__",
     ],
 )
 

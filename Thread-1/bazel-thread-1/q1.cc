@@ -6,8 +6,9 @@
 #include <iostream> // cout, endl
 #include <mutex>
 #include <vector>
-#include <windows.h>
 #include <thread>
+#include <unistd.h>
+#include <algorithm>
 
 #include "lib/utils.h"
 #include "lib/model.h" 
@@ -49,7 +50,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 } 
                 mtx2->unlock();
                 if (flag == 1) {
-                    Sleep(1);
+                    usleep(1000);
                 }
             } while (flag == 1);
             for (int item_index : inst.payloads) {
@@ -60,9 +61,9 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 delete gradient;
             }
             mtx2->lock();
-            std::remove(lock1.begin(),lock1.end(),user_idx);
+            lock1.erase(std::remove(lock1.begin(),lock1.end(),user_idx), lock1.end());
             for (int item_index : inst.payloads) {
-                std::remove(lock2.begin(),lock2.end(),item_index);
+                lock2.erase(std::remove(lock2.begin(),lock2.end(),item_index), lock2.end());
             }
             mtx2->unlock();
             break;
@@ -96,7 +97,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 } 
                 mtx2->unlock();
                 if (flag == 1) {
-                    Sleep(1);
+                    usleep(1000);
                 }
             } while (flag == 1);
             Embedding* user = users->get_embedding(user_idx);
@@ -108,8 +109,8 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
             items->update_embedding(item_idx, gradient, 0.001);
             delete gradient;
             mtx2->lock();
-            std::remove(lock1.begin(),lock1.end(),user_idx);
-            std::remove(lock2.begin(),lock2.end(),item_idx);
+            lock1.erase(std::remove(lock1.begin(),lock1.end(),user_idx), lock1.end());
+            lock2.erase(std::remove(lock2.begin(),lock2.end(),item_idx), lock2.end());
             mtx2->unlock();
 
             break;

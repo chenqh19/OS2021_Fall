@@ -24,11 +24,10 @@ filegroup(
 
 exports_files([
     "xcode_locator.m",
-    "xcode_configure.bzl",
 ])
 
 DARWIN_XCODE_LOCATOR_COMPILE_COMMAND = """
-  /usr/bin/xcrun --sdk macosx clang -mmacosx-version-min=10.9 -fobjc-arc -framework CoreServices \
+  /usr/bin/xcrun --sdk macosx clang -mmacosx-version-min=10.9 -framework CoreServices \
       -framework Foundation -o $@ $<
 """
 

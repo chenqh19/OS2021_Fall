@@ -6,8 +6,9 @@
 #include <iostream> // cout, endl
 #include <mutex>
 #include <vector>
-#include <windows.h>
 #include <thread>
+#include <unistd.h>
+#include <algorithm>
 
 #include "lib/utils.h"
 #include "lib/model.h" 
@@ -54,7 +55,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 } 
                 mtx2->unlock();
                 if (flag == 1) {
-                    Sleep(1);
+                    usleep(1000);
                 }
             } while (flag == 1);
             std::vector<EmbeddingGradient*> gradient_vec(inst.payloads.size());
@@ -110,7 +111,7 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 } 
                 mtx2->unlock();
                 if (flag == 1) {
-                    Sleep(1);
+                    usleep(1000);
                 }
             } while (flag == 1);
             Embedding* user = users->get_embedding(user_idx);
@@ -130,6 +131,34 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
         }
         case RECOMMEND: {
             int user_idx = inst.payloads[0];
+             bool flag = 0;
+            do {
+                mtx2->lock();
+                for (int i = 0; i < lock1.size(); i++) {
+                    if (user_idx == lock1[i]) {
+                        flag = 1;
+                    }
+                }
+                for (int item_index : inst.payloads) {
+		    if (item_index < 2) break;
+                    for (int i = 0; i < lock2.size(); i++) {
+                        if (item_index == lock2[i]) {
+                            flag = 1;
+                        }
+                    }
+                }
+                if (flag == 0) {
+                    for (int item_index : inst.payloads) {
+		    if (item_index < 2) break;
+                        lock2.push_back(item_index);
+                    }
+                    lock1.push_back(user_idx);
+                } 
+                mtx2->unlock();
+                if (flag == 1) {
+                    usleep(1000);
+                }
+            } while (flag == 1);
             Embedding* user = users->get_embedding(user_idx);
             std::vector<Embedding*> item_pool;
             int iter_idx = inst.payloads[1];
@@ -138,6 +167,13 @@ void run_one_instruction(Instruction inst, EmbeddingHolder* users, EmbeddingHold
                 item_pool.push_back(items->get_embedding(item_idx));
             }
             Embedding* recommendation = recommend(user, item_pool);
+            mtx2->lock();
+            std::remove(lock1.begin(),lock1.end(),user_idx);
+            for (int item_index : inst.payloads) {
+		    if (item_index < 2) break;
+                std::remove(lock2.begin(),lock2.end(),item_index);
+            }
+            mtx2->unlock();
             recommendation->write_to_stdout();
             break;
         }
@@ -149,7 +185,7 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
     if(inst.order == 1){
         int iter_idx = inst.payloads[3];
         while (iter_idx > (signed)curr_iter) {
-            Sleep(1);
+            usleep(1000);
         }
         mtx1->lock();
         curr_iter = iter_idx;
@@ -168,7 +204,7 @@ void run_one_instruction_iter(Instruction inst, EmbeddingHolder* users, Embeddin
     else {
         int iter_idx = inst.payloads[1];
         while (iter_idx > (signed)curr_iter) {
-            Sleep(1);
+            usleep(1000);
         }
         run_one_instruction(inst, users, items, mtx1, mtx2, lock1, lock2, mtx);
         
@@ -209,7 +245,7 @@ int main(int argc, char* argv[]) {
            
             /*int iter_idx = inst.payloads[3];
             while (iter_idx > curr_iter) {
-                Sleep(1);
+                usleep(1000);
             }
             mtx1->lock();
             curr_iter = iter_idx;

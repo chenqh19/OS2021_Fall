@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/nix/store/8dxxjbiyxwkvh53q5kh6nydla2anacgi-python3-3.9.6/bin/python
 
 # Copyright 2015 The Bazel Authors. All rights reserved.
 #
