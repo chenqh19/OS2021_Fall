@@ -21,6 +21,11 @@ int ResourceManager::request(RESOURCE r, int amount) {
             auto this_id_1 = std::this_thread::get_id();
             unsigned int this_id = *(unsigned int*)&this_id_1;//把std::thread::id转换为int,不一定对
             bool enough = true;
+            mtx->lock();
+            if (std::find(can_request.begin(), can_request.end(), this_id) != can_request.end()) {
+                mtx->unlock();
+                break;
+            }
             std::map<RESOURCE, int> res = this->required_amount[this_id];
             std::map <RESOURCE, int>::iterator it;
             it = res.begin();
@@ -31,9 +36,6 @@ int ResourceManager::request(RESOURCE r, int amount) {
                 }
             it++;
             }
-            if (std::find(can_request.begin(), can_request.end(), this_id) != can_request.end()) {
-                break;
-            }
             if (enough) {
                 can_request.push_back(this_id);
                 it = res.begin();
@@ -43,6 +45,7 @@ int ResourceManager::request(RESOURCE r, int amount) {
                 }
                 break;
             }
+            mtx->unlock();
             usleep(1000);    
             continue;
         } else {
