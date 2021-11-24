@@ -27,9 +27,9 @@ int ResourceManager::request(RESOURCE r, int amount) {
             // prevent here
             auto this_id = std::this_thread::get_id();
             // std::cout << this_id << std::endl;
-	    if (can_request.size() != 0) {
-		// std::cout << can_request[0];
-	    }
+	    // if (can_request.size() != 0) {
+	    // 	std::cout << can_request[0];
+	    // }
 	    // unsigned int this_id = *(unsigned int*)&this_id_1;//把std::thread::id转换为int,不一定对
             bool enough = true;
             mtx->lock();
