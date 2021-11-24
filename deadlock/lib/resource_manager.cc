@@ -26,16 +26,16 @@ int ResourceManager::request(RESOURCE r, int amount) {
 	    // std::cout << "trying" << std::endl;
             // prevent here
             auto this_id = std::this_thread::get_id();
-            // std::cout << this_id << std::endl;
+            std::cout << this_id << std::endl;
 	    if (can_request.size() != 0) {
-		// std::cout << can_request[0];
+		std::cout << can_request[0];
 	    }
 	    // unsigned int this_id = *(unsigned int*)&this_id_1;//把std::thread::id转换为int,不一定对
             bool enough = true;
             mtx->lock();
             if (std::find(can_request.begin(), can_request.end(), this_id) != can_request.end()) {
                 mtx->unlock();
-	    // std::cout << "trying1" << std::endl;
+	    std::cout << "trying1" << std::endl;
                 break;
             }
             std::map<RESOURCE, int> res = this->required_amount[this_id];
@@ -56,7 +56,7 @@ int ResourceManager::request(RESOURCE r, int amount) {
                 it++;
                 }
 		mtx->unlock();
-	    // std::cout << "trying2" << std::endl;
+	    std::cout << "trying2" << std::endl;
                 break;
             }
             mtx->unlock();
@@ -87,7 +87,7 @@ int ResourceManager::request(RESOURCE r, int amount) {
 
 void ResourceManager::release(RESOURCE r, int amount) {
     if (amount <= 0)  return;
-    // std::cout << "release" << std::endl;
+    std::cout << "release" << std::endl;
     // std::unique_lock<std::mutex> lk(this->resource_mutex[r]);
     mtx->lock();
     this->resource_amount[r] += amount;
