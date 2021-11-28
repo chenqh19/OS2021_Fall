@@ -10,6 +10,9 @@ namespace proj3 {
     }
     void PageFrame::WriteDisk(std::string filename) {
         // write page content into disk files
+        for (int i = 0; i < PageSize; i++) {
+            filename += std::to_string(mem[i]);
+        }
     }
     void PageFrame::ReadDisk(std::string filename) {
         // read page content from disk files
