@@ -16,6 +16,7 @@ namespace proj3 {
     }
     void PageFrame::ReadDisk(std::string filename) {
         // read page content from disk files
+        not completed
     }
 
     PageInfo::PageInfo(){
@@ -23,14 +24,18 @@ namespace proj3 {
     void PageInfo::SetInfo(int cur_holder, int cur_vid){
         //modify the page states
         //you can add extra parameters if needed
+        holder = cur_holder;
+        virtual_page_id = cur_vid;
     }
     void PageInfo::ClearInfo(){
         //clear the page states
         //you can add extra parameters if needed
+        holder = -1;
+        virtual_page_id = -1;
     }
 
-    int PageInfo::GetHolder(){}
-    int PageInfo::GetVid(){}
+    int PageInfo::GetHolder(){return holder;}
+    int PageInfo::GetVid(){return virtual_page_id;}
     
 
     MemoryManager::MemoryManager(size_t sz){
@@ -41,12 +46,17 @@ namespace proj3 {
     }
     void MemoryManager::PageOut(int physical_page_id){
         //swap out the physical page with the indx of 'physical_page_id out' into a disk file
+        mem[physical_page_id]->WriteDisk();
+        page_info[physical_page_id].ClearInfo();
     }
     void MemoryManager::PageIn(int array_id, int virtual_page_id, int physical_page_id){
         //swap the target page from the disk file into a physical page with the index of 'physical_page_id out'
+        mem[physical_page_id]->ReadDisk();
+        page_info[physical_page_id].SetInfo(array_id, virtual_page_id);
     }
     void MemoryManager::PageReplace(int array_id, int virtual_page_id){
         //implement your page replacement policy here
+        
     }
     int MemoryManager::ReadPage(int array_id, int virtual_page_id, int offset){
         // for arrayList of 'array_id', return the target value on its virtual space
