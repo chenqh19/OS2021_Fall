@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 #include <cstdlib>
-#include<cstdio>
+#include <cstdio>
 
 #define PageSize 1024
 
@@ -17,6 +17,8 @@ public:
     int& operator[] (unsigned long);
     void WriteDisk(std::string);
     void ReadDisk(std::string);
+    int ReadContent(int offset){return mem[offset];}
+    int WriteContent(int offset, int value){mem[offset] = value;}
 private:
     int mem[PageSize];
 };
