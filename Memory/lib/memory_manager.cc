@@ -10,9 +10,9 @@ namespace proj3 {
     }
     void PageFrame::WriteDisk(std::string filename) {
         // write page content into disk files
-        for (int i = 0; i < PageSize; i++) {
-            filename += std::to_string(mem[i]);
-        }
+        // for (int i = 0; i < PageSize; i++) {
+        //     filename += std::to_string(mem[i]);
+        // }
     }
     void PageFrame::ReadDisk(std::string filename) {
         // read page content from disk files
@@ -61,16 +61,24 @@ namespace proj3 {
     }
     int MemoryManager::ReadPage(int array_id, int virtual_page_id, int offset){
         // for arrayList of 'array_id', return the target value on its virtual space
+        return mem[page_map[array_id][virtual_page_id]]->ReadContent(offset);
         
     }
     void MemoryManager::WritePage(int array_id, int virtual_page_id, int offset, int value){
         // for arrayList of 'array_id', write 'value' into the target position on its virtual space
+        mem[page_map[array_id][virtual_page_id]]->WriteContent(offset, value);
     }
     ArrayList* MemoryManager::Allocate(size_t sz){
         // when an application requires for memory, create an ArrayList and record mappings from its virtual memory space to the physical memory space
+        ArrayList new_array_list(sz, this, next_array_id);
+        ArrayList* nalp = &new_array_list;
+        next_array_id++;
+        return nalp;
     }
     void MemoryManager::Release(ArrayList* arr){
         // an application will call release() function when destroying its arrayList
         // release the virtual space of the arrayList and erase the corresponding mappings
+        arr->~ArrayList();
+        next_array_id--; // not sure
     }
 } // namespce: proj3
