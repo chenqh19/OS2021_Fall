@@ -64,7 +64,6 @@ namespace proj3 {
     }
     void MemoryManager::PageIn(int array_id, int virtual_page_id, int physical_page_id){
         //swap the target page from the disk file into a physical page with the index of 'physical_page_id out'
-        PageOut(physical_page_id);
         std::string fname = "/tmp/at" + std::to_string(array_id) + std::to_string(virtual_page_id);
         mem[physical_page_id]->ReadDisk(fname);
         page_info[physical_page_id].SetInfo(array_id, virtual_page_id);
@@ -73,6 +72,12 @@ namespace proj3 {
     }
     void MemoryManager::PageReplace(int array_id, int virtual_page_id){
         //implement your page replacement policy here
+        
+        // implement a random algorithm first
+        srand((unsigned)time(NULL));
+        int ppid = rand()/(sizeof(page_info)/sizeof(page_info[0]));
+        PageOut(ppid);
+        PageIn(array_id, virtual_page_id, ppid);
 
     }
     int MemoryManager::ReadPage(int array_id, int virtual_page_id, int offset){
