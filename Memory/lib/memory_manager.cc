@@ -56,12 +56,17 @@ namespace proj3 {
     }
     void MemoryManager::PageOut(int physical_page_id){
         //swap out the physical page with the indx of 'physical_page_id out' into a disk file
-        mem[physical_page_id]->WriteDisk(); // use a uniform rule of naming
+        int hd = page_info[physical_page_id].GetHolder();
+        int vid = page_info[physical_page_id].GetVid();
+        std::string fname = "/tmp/at" + std::to_string(hd) + std::to_string(vid);
+        mem[physical_page_id]->WriteDisk(fname); // use a uniform rule of naming
         page_info[physical_page_id].ClearInfo();
     }
     void MemoryManager::PageIn(int array_id, int virtual_page_id, int physical_page_id){
         //swap the target page from the disk file into a physical page with the index of 'physical_page_id out'
-        mem[physical_page_id]->ReadDisk();
+        PageOut(physical_page_id);
+        std::string fname = "/tmp/at" + std::to_string(array_id) + std::to_string(virtual_page_id);
+        mem[physical_page_id]->ReadDisk(fname);
         page_info[physical_page_id].SetInfo(array_id, virtual_page_id);
         page_map[array_id].insert(std::make_pair(virtual_page_id, physical_page_id));
 
