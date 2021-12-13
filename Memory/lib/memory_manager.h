@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdlib>
 #include <cstdio>
+#include <fstream>
 
 #define PageSize 1024
 

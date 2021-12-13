@@ -10,12 +10,23 @@ namespace proj3 {
     }
     void PageFrame::WriteDisk(std::string filename) {
         // write page content into disk files
-        // for (int i = 0; i < PageSize; i++) {
-        //     filename += std::to_string(mem[i]);
-        // }
+        std::ofstream fout(filename);
+        if (fout) {
+            for (int i = 0; i < PageSize; i++) {
+                fout << mem[i] << std::endl;
+            }
+        }
+        fout.close();
     }
     void PageFrame::ReadDisk(std::string filename) {
         // read page content from disk files
+        std::ifstream fin(filename);
+        if (fin) {
+            for (int i = 0; i < PageSize; i++) {
+                fin >> mem[i] >> std::endl;
+            }
+        }
+        fin.close();
     }
 
     PageInfo::PageInfo(){
@@ -45,7 +56,7 @@ namespace proj3 {
     }
     void MemoryManager::PageOut(int physical_page_id){
         //swap out the physical page with the indx of 'physical_page_id out' into a disk file
-        mem[physical_page_id]->WriteDisk();
+        mem[physical_page_id]->WriteDisk(); // use a uniform rule of naming
         page_info[physical_page_id].ClearInfo();
     }
     void MemoryManager::PageIn(int array_id, int virtual_page_id, int physical_page_id){
