@@ -7,6 +7,7 @@ namespace proj3 {
     }
     int& PageFrame::operator[] (unsigned long idx){
         //each page should provide random access like an array
+        return mem[idx];
     }
     void PageFrame::WriteDisk(std::string filename) {
         // write page content into disk files
@@ -68,6 +69,7 @@ namespace proj3 {
         mem[physical_page_id]->ReadDisk(fname);
         page_info[physical_page_id].SetInfo(array_id, virtual_page_id);
         page_map[array_id].insert(std::make_pair(virtual_page_id, physical_page_id));
+        page_queue.push_back(physical_page_id);
 
     }
     void MemoryManager::PageReplace(int array_id, int virtual_page_id){
@@ -76,6 +78,12 @@ namespace proj3 {
         // implement a random algorithm first
         srand((unsigned)time(NULL));
         int ppid = rand()/(sizeof(page_info)/sizeof(page_info[0]));
+        PageOut(ppid);
+        PageIn(array_id, virtual_page_id, ppid);
+
+        //FIFO implementation
+        int ppid = page_queue.begin();
+        page_list.erase(page_queue.begin());
         PageOut(ppid);
         PageIn(array_id, virtual_page_id, ppid);
 
