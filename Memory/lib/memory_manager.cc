@@ -24,7 +24,7 @@ namespace proj3 {
         std::ifstream fin(filename);
         if (fin) {
             for (int i = 0; i < PageSize; i++) {
-                fin >> mem[i] >> std::endl;
+                fin >> mem[i];
             }
         }
         fin.close();
@@ -78,45 +78,56 @@ namespace proj3 {
         // int ppid = rand()/(sizeof(page_info)/sizeof(page_info[0]));
         // PageOut(ppid);
         // PageIn(array_id, virtual_page_id, ppid);
-
+        bool hit = false;
         //FIFO implementation
-        bool hit = false;
-        for (int i = 0; i < page_queue[array_id].size(); i ++) {
-            if (page_queue[array_id][i] == virtual_page_id) {
-                hit = true;
+        if (FIFO) {
+            for (int i = 0; i < page_queue[array_id].size(); i ++) {
+                if (page_queue[array_id][i] == virtual_page_id) {
+                    hit = true;
+                }
             }
-        }
-        if (!hit) {
-            int ppid = page_queue[array_id].at(0);
-            page_queue[array_id].erase(page_queue[array_id].begin());
-            page_queue[array_id].push_back(ppid);
-            PageOut(ppid);
-            PageIn(array_id, virtual_page_id, ppid);
-        }
-
+            if (!hit) {
+                if (page_queue.size() < sizeof(page_info)/sizeof(page_info[0])) {// have idle physical memory
+                    int ppid = page_queue.size();
+                    page_queue[array_id].push_back(ppid);
+                } else {
+                    int ppid = page_queue[array_id].at(0);
+                    page_queue[array_id].erase(page_queue[array_id].begin());
+                    page_queue[array_id].push_back(ppid);
+                    PageOut(ppid);
+                    PageIn(array_id, virtual_page_id, ppid);
+                }
+            }
+        } else {
         //CLOCK implementation
-        bool hit = false;
-        for (int i = 0; i < page_queue[array_id].size(); i ++) {
-            if (page_queue[array_id][i] == virtual_page_id) {
-                hit = true;
-                clock_bit[array_id][i] = true;
+            for (int i = 0; i < page_queue[array_id].size(); i ++) {
+                if (page_queue[array_id][i] == virtual_page_id) {
+                    hit = true;
+                    clock_bit[array_id][i] = true;
+                }
             }
-        }
-        if (!hit) {
-            while (clock_bit[array_id].at(0) = true) {
-                clock_bit[array_id].erase(clock_bit[array_id].begin());
-                clock_bit[array_id].push_back(false);
-                int p = page_queue[array_id].at(0);
-                page_queue[array_id].erase(page_queue[array_id].begin());
-                page_queue[array_id].push_back(p);
+            if (!hit) {
+                if (page_queue.size() < sizeof(page_info)/sizeof(page_info[0])) {// have idle physical memory
+                    int ppid = page_queue.size();
+                    page_queue[array_id].push_back(ppid);
+                    clock_bit[array_id].push_back(false);
+                } else {
+                    while (clock_bit[array_id].at(0) = true) {
+                        clock_bit[array_id].erase(clock_bit[array_id].begin());
+                        clock_bit[array_id].push_back(false);
+                        int p = page_queue[array_id].at(0);
+                        page_queue[array_id].erase(page_queue[array_id].begin());
+                        page_queue[array_id].push_back(p);
+                    }
+                    int ppid = page_queue[array_id].at(0);
+                    page_queue[array_id].erase(page_queue[array_id].begin());
+                    page_queue[array_id].push_back(ppid);
+                    clock_bit[array_id].erase(clock_bit[array_id].begin());
+                    clock_bit[array_id].push_back(false);
+                    PageOut(ppid);
+                    PageIn(array_id, virtual_page_id, ppid);
+                }
             }
-            int ppid = page_queue[array_id].at(0);
-            page_queue[array_id].erase(page_queue[array_id].begin());
-            page_queue[array_id].push_back(ppid);
-            clock_bit[array_id].erase(clock_bit[array_id].begin());
-            clock_bit[array_id].push_back(false);
-            PageOut(ppid);
-            PageIn(array_id, virtual_page_id, ppid);
         }
 
         // //LRU implementation
