@@ -9,6 +9,7 @@
 #include <fstream>
 #include <time.h>
 #include <vector>
+#include <iostream>
 
 #define PageSize 1024
 

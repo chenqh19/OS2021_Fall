@@ -87,9 +87,10 @@ namespace proj3 {
                 }
             }
             if (!hit) {
-                if (page_queue.size() < sizeof(page_info)/sizeof(page_info[0])) {// have idle physical memory
+                if (page_queue[array_id].size() < sizeof(page_info)/sizeof(page_info[0])) {// have idle physical memory
                     int ppid = page_queue.size();
                     page_queue[array_id].push_back(ppid);
+                    PageIn(array_id, virtual_page_id, ppid);
                 } else {
                     int ppid = page_queue[array_id].at(0);
                     page_queue[array_id].erase(page_queue[array_id].begin());
@@ -107,10 +108,11 @@ namespace proj3 {
                 }
             }
             if (!hit) {
-                if (page_queue.size() < sizeof(page_info)/sizeof(page_info[0])) {// have idle physical memory
+                if (page_queue[array_id].size() < sizeof(page_info)/sizeof(page_info[0])) {// have idle physical memory
                     int ppid = page_queue.size();
                     page_queue[array_id].push_back(ppid);
                     clock_bit[array_id].push_back(false);
+                    PageIn(array_id, virtual_page_id, ppid);
                 } else {
                     while (clock_bit[array_id].at(0) = true) {
                         clock_bit[array_id].erase(clock_bit[array_id].begin());
