@@ -69,7 +69,6 @@ namespace proj3 {
         mem[physical_page_id]->ReadDisk(fname);
         page_info[physical_page_id].SetInfo(array_id, virtual_page_id);
         page_map[array_id].insert(std::make_pair(virtual_page_id, physical_page_id));
-
     }
     void MemoryManager::PageReplace(int array_id, int virtual_page_id){
         //implement your page replacement policy here
@@ -94,6 +93,27 @@ namespace proj3 {
             PageOut(ppid);
             PageIn(array_id, virtual_page_id, ppid);
         }
+
+        //LRU implementation
+        bool hit = false;
+        for(int i = 0; i < page_queue[array_id].size(); i++) {
+            if(page_queue[array_id][i] == virtual_page_id) {
+                hit = true;
+                int ppid = page_queue[array_id].at(i);
+                page_queue[array_id].erase(page_queue[array_id].at(i));
+                page_queue[array_id].push_back[ppid];
+            }
+        }
+        if (!hit) {
+            int ppid = page_queue[array_id].at(0);
+            page_queue[array_id].erase(page_queue[array_id].begin());
+            page_queue[array_id].push_back(ppid);
+            PageOut(ppid);
+            PageIn(array_id, virtual_page_id, ppid);
+        }
+
+        
+
 
     }
     int MemoryManager::ReadPage(int array_id, int virtual_page_id, int offset){

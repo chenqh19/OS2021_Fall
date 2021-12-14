@@ -60,6 +60,7 @@ private:
     size_t mma_sz;
     /*add your extra states here freely for implementation*/
     std::map<int, std::vector<int>> page_queue;
+    
 
     void PageIn(int array_id, int virtual_page_id, int physical_page_id);
     void PageOut(int physical_page_id);
