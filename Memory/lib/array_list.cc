@@ -4,6 +4,9 @@
 
 namespace proj3 {
     ArrayList::ArrayList(size_t sz, MemoryManager* cur_mma, int id){
+        this->array_id = id;
+        this->mma = cur_mma;
+        this->size = sz;
     }
     int ArrayList::Read (unsigned long idx){
         //read the value in the virtual index of 'idx' from mma's memory space

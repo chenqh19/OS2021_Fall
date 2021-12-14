@@ -56,14 +56,20 @@ TEST_F(MMATest,task1){
 TEST_F(MMATest,task2){
 	std::vector<proj3::ArrayList*>arr;
     for(int i = 0; i<loop_times; i++){
+        // std::cerr <<"da" << i <<std::endl;
         arr.push_back(mma->Allocate(workload_sz_2));
-        for(unsigned long j = 0; j < workload_sz_2; j++)arr[i]->Write(j, i);
+        // std::cerr <<"gg" << i <<std::endl;
+        for(unsigned long j = 0; j < workload_sz_2; j++) {arr[i]->Write(j, i);
+        // std::cerr <<"pp" << i << " " << j <<std::endl;
+        }
     }
     for(int i = 0; i<loop_times; i++){
+        // std::cerr <<"pp" << i <<std::endl;
         if(i %2)mma->Release(arr[i]);
-        else for(unsigned long j = 0; j < workload_sz_2; j++)EXPECT_EQ(i, arr[i]->Read(j));
+        else for(unsigned long j = 0; j < workload_sz_2; j++){if(i!=arr[i]->Read(j))throw std::runtime_error("qewew ");EXPECT_EQ(i, arr[i]->Read(j));}
     }
     for(int i = 0; i<loop_times; i++){
+        // std::cerr <<"oo" << i <<std::endl;
         if(i %2 == 0)mma->Release(arr[i]);
     }
 }
