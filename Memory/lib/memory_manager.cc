@@ -12,22 +12,24 @@ namespace proj3 {
     void PageFrame::WriteDisk(std::string filename) {
         // write page content into disk files
         std::ofstream fout(filename);
-        if (fout) {
+        /*if (fout) {
             for (int i = 0; i < PageSize; i++) {
                 fout << mem[i] << std::endl;
             }
         }
-        fout.close();
+        fout.close();*/
+        fout.write(reinterpret_cast<char *>(mem), PageSize * sizeof(int));
     }
     void PageFrame::ReadDisk(std::string filename) {
         // read page content from disk files
         std::ifstream fin(filename);
-        if (fin) {
+        /*if (fin) {
             for (int i = 0; i < PageSize; i++) {
                 fin >> mem[i];
             }
         }
-        fin.close();
+        fin.close();*/
+        fin.read(reinterpret_cast<char *>(mem), PageSize * sizeof(int));
     }
 
     PageInfo::PageInfo(){
@@ -51,7 +53,13 @@ namespace proj3 {
 
     MemoryManager::MemoryManager(size_t sz){
         //mma should build its memory space with given space size
-        //you should not allocate larger space than 'sz' (the number of physical pages) 
+        //you should not allocate larger space than 'sz' (the number of physical pages)
+        this->page_map.clear();
+        *this->mem =  new PageFrame[sz]();
+        this->page_info = new PageInfo[sz]();
+        this->free_list = new unsigned int[sz]();
+        this->next_array_id = 0;
+        this->mma_sz = sz;
     }
     MemoryManager::~MemoryManager(){
     }
