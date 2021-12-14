@@ -94,23 +94,48 @@ namespace proj3 {
             PageIn(array_id, virtual_page_id, ppid);
         }
 
-        //LRU implementation
+        //CLOCK implementation
         bool hit = false;
-        for(int i = 0; i < page_queue[array_id].size(); i++) {
-            if(page_queue[array_id][i] == virtual_page_id) {
+        for (int i = 0; i < page_queue[array_id].size(); i ++) {
+            if (page_queue[array_id][i] == virtual_page_id) {
                 hit = true;
-                int ppid = page_queue[array_id].at(i);
-                page_queue[array_id].erase(page_queue[array_id].at(i));
-                page_queue[array_id].push_back[ppid];
+                clock_bit[array_id][i] = true;
             }
         }
         if (!hit) {
+            while (clock_bit[array_id].at(0) = true) {
+                clock_bit[array_id].erase(clock_bit[array_id].begin());
+                clock_bit[array_id].push_back(false);
+                int p = page_queue[array_id].at(0);
+                page_queue[array_id].erase(page_queue[array_id].begin());
+                page_queue[array_id].push_back(p);
+            }
             int ppid = page_queue[array_id].at(0);
             page_queue[array_id].erase(page_queue[array_id].begin());
             page_queue[array_id].push_back(ppid);
+            clock_bit[array_id].erase(clock_bit[array_id].begin());
+            clock_bit[array_id].push_back(false);
             PageOut(ppid);
             PageIn(array_id, virtual_page_id, ppid);
         }
+
+        // //LRU implementation
+        // bool hit = false;
+        // for(int i = 0; i < page_queue[array_id].size(); i++) {
+        //     if(page_queue[array_id][i] == virtual_page_id) {
+        //         hit = true;
+        //         int ppid = page_queue[array_id].at(i);
+        //         page_queue[array_id].erase(page_queue[array_id].begin()+i);
+        //         page_queue[array_id].push_back(ppid);
+        //     }
+        // }
+        // if (!hit) {
+        //     int ppid = page_queue[array_id].at(0);
+        //     page_queue[array_id].erase(page_queue[array_id].begin());
+        //     page_queue[array_id].push_back(ppid);
+        //     PageOut(ppid);
+        //     PageIn(array_id, virtual_page_id, ppid);
+        // }
 
         
 
