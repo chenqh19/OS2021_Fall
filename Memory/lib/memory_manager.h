@@ -52,8 +52,8 @@ public:
     ArrayList* Allocate(size_t);
     void Release(ArrayList*);
     ~MemoryManager();
-private:
     bool FIFO = false;
+private:
     std::map<int, std::map<int, int>> page_map; // // mapping from ArrayList's virtual page # to physical page #
     PageFrame** mem; // physical pages, using 'PageFrame* mem' is also acceptable 
     PageInfo* page_info; // physical page info
