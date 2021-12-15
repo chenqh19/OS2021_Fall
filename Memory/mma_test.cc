@@ -115,16 +115,16 @@ void workload(proj3::MemoryManager * my_mma, size_t workload_sz){
     my_mma->Release(arr);
 }
 
-TEST_F(MMATest,task4){
-    std::vector<std::thread*> pool;
-    for(int i = 0; i<thread_num; i++) {
-        pool.push_back(new std::thread(&workload, mma, workload_sz_4));
-    }
+// TEST_F(MMATest,task4){
+//     std::vector<std::thread*> pool;
+//     for(int i = 0; i<thread_num; i++) {
+//         pool.push_back(new std::thread(&workload, mma, workload_sz_4));
+//     }
 
-    for (auto t: pool) {
-        t->join();
-    }
-}
+//     for (auto t: pool) {
+//         t->join();
+//     }
+// }
 
 } // namespace testing
 } // namespace proj3

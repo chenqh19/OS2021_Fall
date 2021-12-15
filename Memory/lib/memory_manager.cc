@@ -69,6 +69,10 @@ namespace proj3 {
         }
         this->page_info = new PageInfo[sz]();
         this->free_list = new bool[sz]();
+        for (int i = 0; i < sz; i++) {
+            free_list[i] = false;
+            page_info[i].SetInfo(-1, -1);
+        }
         this->next_array_id = 0;
         this->mma_sz = sz;
     }
@@ -79,7 +83,7 @@ namespace proj3 {
         //swap out the physical page with the indx of 'physical_page_id out' into a disk file
         int hd = page_info[physical_page_id].GetHolder();
         int vid = page_info[physical_page_id].GetVid();
-        std::string fname = "./data/at" + std::to_string(hd) + std::to_string(vid);
+        std::string fname = "./data/at" + std::to_string(hd) + "at" + std::to_string(vid);
         mem[physical_page_id]->WriteDisk(fname); // use a uniform rule of naming
         page_info[physical_page_id].ClearInfo();
         free_list[physical_page_id] = false;
@@ -88,7 +92,7 @@ namespace proj3 {
     void MemoryManager::PageIn(int array_id, int virtual_page_id, int physical_page_id){
         //swap the target page from the disk file into a physical page with the index of 'physical_page_id out'
         free_list[physical_page_id] = true;
-        std::string fname = "./data/at" + std::to_string(array_id) + std::to_string(virtual_page_id);
+        std::string fname = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
         mem[physical_page_id]->ReadDisk(fname);
         page_info[physical_page_id].SetInfo(array_id, virtual_page_id);
         page_map[array_id].insert(std::make_pair(virtual_page_id, physical_page_id));
@@ -149,7 +153,7 @@ namespace proj3 {
                     clock_bit.push_back(false);
                     PageIn(array_id, virtual_page_id, ppid);
                 } else {
-                    while (clock_bit.at(0) = true) {
+                    while (clock_bit.at(0) == true) {
                         clock_bit.erase(clock_bit.begin());
                         clock_bit.push_back(false);
                         int p = page_queue.at(0);
@@ -206,6 +210,7 @@ namespace proj3 {
             free_list[ppid] = false;
             // page_queue.erase(std::remove(page_queue.begin(), page_queue.end(), ppid), page_queue.end());
             int j = 0;
+            // std::vector<bool>::iterator citer = clock_bit.begin();
             for (std::vector<int>::iterator iter = page_queue.begin(); iter != page_queue.end(); iter++) {
                 if (*iter == ppid) {
                     page_queue.erase(iter);
@@ -214,12 +219,14 @@ namespace proj3 {
                     }
                     break;
                 }
-                j ++;
+                j++;
             }
-            std::remove(("./data/at" + std::to_string(arr->array_id) + std::to_string(i)).c_str());
             i++;
         }
         page_map.erase(arr->array_id);
+        for (int j = 0; j < mma_sz; j++) {
+            std::remove(("./data/at" + std::to_string(arr->array_id) + "at" + std::to_string(j)).c_str());
+        }
         // next_array_id--; // not sure
     }
 } // namespce: proj3
