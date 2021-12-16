@@ -69,8 +69,10 @@ namespace proj3 {
         }
         this->page_info = new PageInfo[sz]();
         this->free_list = new bool[sz]();
+        this->lkpp = new bool[sz]();
         for (int i = 0; i < sz; i++) {
             free_list[i] = false;
+            lkpp[i] = false;
             page_info[i].SetInfo(-1, -1);
         }
         this->next_array_id = 0;
@@ -83,8 +85,8 @@ namespace proj3 {
         //swap out the physical page with the indx of 'physical_page_id out' into a disk file
         int hd = page_info[physical_page_id].GetHolder();
         int vid = page_info[physical_page_id].GetVid();
-        std::string fname = "./data/at" + std::to_string(hd) + "at" + std::to_string(vid);
-        mem[physical_page_id]->WriteDisk(fname); // use a uniform rule of naming
+        // std::string fname = "./data/at" + std::to_string(hd) + "at" + std::to_string(vid);
+        // mem[physical_page_id]->WriteDisk(fname); // use a uniform rule of naming
         page_info[physical_page_id].ClearInfo();
         free_list[physical_page_id] = false;
         page_map[hd].erase(vid);
@@ -92,12 +94,12 @@ namespace proj3 {
     void MemoryManager::PageIn(int array_id, int virtual_page_id, int physical_page_id){
         //swap the target page from the disk file into a physical page with the index of 'physical_page_id out'
         free_list[physical_page_id] = true;
-        std::string fname = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
-        mem[physical_page_id]->ReadDisk(fname);
+        // std::string fname = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
+        // mem[physical_page_id]->ReadDisk(fname);
         page_info[physical_page_id].SetInfo(array_id, virtual_page_id);
         page_map[array_id].insert(std::make_pair(virtual_page_id, physical_page_id));
     }
-    void MemoryManager::PageReplace(int array_id, int virtual_page_id){
+    int MemoryManager::PageReplace(int array_id, int virtual_page_id){
         //implement your page replacement policy here
         
         // // implement a random algorithm first
@@ -106,8 +108,10 @@ namespace proj3 {
         // PageOut(ppid);
         // PageIn(array_id, virtual_page_id, ppid);
         bool hit = false;
+        int ppid;
         //FIFO implementation
         if (FIFO) {
+            mtx->unlock();
             for (int i = 0; i < page_queue.size(); i ++) {
                 if (page_info[page_queue[i]].GetHolder() == array_id && page_info[page_queue[i]].GetVid() == virtual_page_id) {
                     hit = true;
@@ -115,7 +119,6 @@ namespace proj3 {
             }
             if (!hit) {
                 if (page_queue.size() < mma_sz) {// have idle physical memory
-                    int ppid;
                     for (int j = 0; j < mma_sz; j++) {
                         if (free_list[j] == false) {
                             ppid = j;
@@ -124,12 +127,20 @@ namespace proj3 {
                     }
                     page_queue.push_back(ppid);
                     PageIn(array_id, virtual_page_id, ppid);
+                    std::string fname = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
+                    mem[ppid]->ReadDisk(fname);
                 } else {
-                    int ppid = page_queue.at(0);
+                    ppid = page_queue.at(0);
                     page_queue.erase(page_queue.begin());
                     page_queue.push_back(ppid);
+                    int hd = page_info[ppid].GetHolder();
+                    int vid = page_info[ppid].GetVid();
                     PageOut(ppid);
                     PageIn(array_id, virtual_page_id, ppid);
+                    std::string fname = "./data/at" + std::to_string(hd) + "at" + std::to_string(vid);
+                    mem[ppid]->WriteDisk(fname); // use a uniform rule of naming
+                    std::string fname1 = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
+                    mem[ppid]->ReadDisk(fname1);
                 }
             }
         } else {
@@ -142,16 +153,33 @@ namespace proj3 {
             }
             if (!hit) {
                 if (page_queue.size() < mma_sz) {// have idle physical memory
-                    int ppid;
                     for (int j = 0; j < mma_sz; j++) {
                         if (free_list[j] == false) {
                             ppid = j;
+                            free_list[ppid] = true;
                             break;
                         }
                     }
                     page_queue.push_back(ppid);
                     clock_bit.push_back(false);
+                    
                     PageIn(array_id, virtual_page_id, ppid);
+                    mtx->unlock();
+                    while (true) {
+                        mtx1->lock();
+                        if (!lkpp[ppid]) {
+                            lkpp[ppid] = true;
+                            mtx1->unlock();
+                            break;
+                        }
+                        mtx1->unlock();
+                        usleep(200);
+                    }
+                    std::string fname = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
+                    mem[ppid]->ReadDisk(fname);
+                    mtx1->lock();
+                    lkpp[ppid] = false;
+                    mtx1->unlock();
                 } else {
                     while (clock_bit.at(0) == true) {
                         clock_bit.erase(clock_bit.begin());
@@ -160,57 +188,95 @@ namespace proj3 {
                         page_queue.erase(page_queue.begin());
                         page_queue.push_back(p);
                     }
-                    int ppid = page_queue.at(0);
+                    ppid = page_queue.at(0);
                     page_queue.erase(page_queue.begin());
                     page_queue.push_back(ppid);
                     clock_bit.erase(clock_bit.begin());
                     clock_bit.push_back(false);
+                    
+                    int hd = page_info[ppid].GetHolder();
+                    int vid = page_info[ppid].GetVid();
                     PageOut(ppid);
                     PageIn(array_id, virtual_page_id, ppid);
+                    
+                    std::string fname = "./data/at" + std::to_string(hd) + "at" + std::to_string(vid);
+                    mem[ppid]->WriteDisk(fname); // use a uniform rule of naming
+                    mtx->unlock();
+                    while (true) {
+                        mtx1->lock();
+                        if (!lkpp[ppid]) {
+                            lkpp[ppid] = true;
+                            mtx1->unlock();
+                            break;
+                        }
+                        mtx1->unlock();
+                        usleep(200);
+                    }
+                    std::string fname1 = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
+                    mem[ppid]->ReadDisk(fname1);
+                    mtx1->lock();
+                    lkpp[ppid] = false;
+                    mtx1->unlock();
                 }
+            } else {
+                mtx->unlock();
             }
         }
+        return ppid;
     }
     int MemoryManager::ReadPage(int array_id, int virtual_page_id, int offset){
         // for arrayList of 'array_id', return the target value on its virtual space
+        mtx->lock();
+        int ppid;
         if (!page_map[array_id].count(virtual_page_id)) {
-            PageReplace(array_id, virtual_page_id);
+            ppid = PageReplace(array_id, virtual_page_id);
+        } else {
+            ppid = page_map[array_id][virtual_page_id];
+            mtx->unlock();
         }
-        return mem[page_map[array_id][virtual_page_id]]->ReadContent(offset);
-        
+        int con = mem[ppid]->ReadContent(offset);
+        return con;
     }
     void MemoryManager::WritePage(int array_id, int virtual_page_id, int offset, int value){
         // for arrayList of 'array_id', write 'value' into the target position on its virtual space
+        mtx->lock();
+        int ppid;
         if (!page_map[array_id].count(virtual_page_id)) {
-            PageReplace(array_id, virtual_page_id);
+            ppid = PageReplace(array_id, virtual_page_id);
+        } else {
+            ppid = page_map[array_id][virtual_page_id];
+            mtx->unlock();
         }
-        mem[page_map[array_id][virtual_page_id]]->WriteContent(offset, value);
+        mem[ppid]->WriteContent(offset, value);
     }
     ArrayList* MemoryManager::Allocate(size_t sz){
         // when an application requires for memory, create an ArrayList and record mappings from its virtual memory space to the physical memory space
+        mtx->lock();
         ArrayList* nalp = new ArrayList(sz, this, next_array_id);
         std::map<int, int> map;
         page_map.insert(std::make_pair(next_array_id, map));
         next_array_id++;
+        mtx->unlock();
         return nalp;
     }
     void MemoryManager::Release(ArrayList* arr){
         // an application will call release() function when destroying its arrayList
         // release the virtual space of the arrayList and erase the corresponding mappings
-        arr->~ArrayList();
         std::map<int, std::map<int, int>>::iterator iter;
         int i = 0;
+        mtx->lock();
         if (!page_map.count(arr->array_id)) {
             return;
         }
+        
         while(iter != page_map.end()) {
             if (page_map[arr->array_id].find(i) == page_map[arr->array_id].end()) {break;}
+            
             int ppid = page_map[arr->array_id][i];
             page_info[ppid].ClearInfo();
             free_list[ppid] = false;
-            // page_queue.erase(std::remove(page_queue.begin(), page_queue.end(), ppid), page_queue.end());
             int j = 0;
-            // std::vector<bool>::iterator citer = clock_bit.begin();
+            
             for (std::vector<int>::iterator iter = page_queue.begin(); iter != page_queue.end(); iter++) {
                 if (*iter == ppid) {
                     page_queue.erase(iter);
@@ -224,9 +290,11 @@ namespace proj3 {
             i++;
         }
         page_map.erase(arr->array_id);
+        mtx->unlock();
         for (int j = 0; j < mma_sz; j++) {
             std::remove(("./data/at" + std::to_string(arr->array_id) + "at" + std::to_string(j)).c_str());
         }
         // next_array_id--; // not sure
+        arr->~ArrayList();
     }
 } // namespce: proj3
