@@ -74,6 +74,8 @@ private:
     std::mutex* mtx1 = &m1;
     std::mutex m2;
     std::mutex* mtx2 = &m2;
+
+    std::vector<int> locker;
     
 
     void PageIn(int array_id, int virtual_page_id, int physical_page_id);
