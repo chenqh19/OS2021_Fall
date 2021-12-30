@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 
-namespace proj3 {
+namespace proj4 {
 
     class MemoryManager;
 

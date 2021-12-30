@@ -2,7 +2,7 @@
 
 #include "memory_manager.h"
 
-namespace proj3 {
+namespace proj4 {
     ArrayList::ArrayList(size_t sz, MemoryManager* cur_mma, int id){
         this->array_id = id;
         this->mma = cur_mma;

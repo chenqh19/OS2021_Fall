@@ -16,7 +16,7 @@
 
 #define PageSize 1024
 
-namespace proj3 {
+namespace proj4 {
 
 class PageFrame {
 public:
