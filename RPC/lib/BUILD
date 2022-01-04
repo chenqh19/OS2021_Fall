@@ -16,6 +16,9 @@ cc_library(
         "@com_github_grpc_grpc//:grpc++_reflection",
         "//proto:mma_grpc",
     ],
+    copts = [
+        "-std=c++17",
+    ],
 )
 
 cc_library(
@@ -34,6 +37,9 @@ cc_library(
         "@com_github_grpc_grpc//:grpc++_reflection",
         "//proto:mma_grpc",
     ],
+    copts = [
+        "-std=c++17",
+    ],
 )
 
 cc_library(
@@ -44,4 +50,7 @@ cc_library(
     hdrs = [
         "utils.h",
         ],
+    copts = [
+        "-std=c++17",
+    ],
 )

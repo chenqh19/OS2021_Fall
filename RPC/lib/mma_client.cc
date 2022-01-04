@@ -53,19 +53,22 @@ namespace proj4{
     }
 
     ArrayList* MmaClient::Allocate(size_t sz) {
-        mma::AllocateRequest request;
-        mma::AllocateReply reply;
-        request.set_size(sz);
-        ClientContext context;
-        Status status = stub_->Allocate(&context, request, &reply);
-        if(status.ok()) {
-            return new ArrayList(reply.array_id(), this, sz);
-        } else {
-            //需要报错方式
-            std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
-                throw std::runtime_error("RPC failed");
-        }
+        while(true){
+            mma::AllocateRequest request;
+            mma::AllocateReply reply;
+            request.set_size(sz);
+            ClientContext context;
+            Status status = stub_->Allocate(&context, request, &reply);
+            if(status.ok()) {
+                return new ArrayList(reply.array_id(), this, sz);
+            } else {
+                //需要报错方式
+                //std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
+                    //throw std::runtime_error("RPC failed");
+                // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
 
+        }
     }
 
     void MmaClient::Free(ArrayList* arr) {
@@ -75,12 +78,26 @@ namespace proj4{
         request.set_num_of_pages((arr->size+PageSize-1)/PageSize);
         ClientContext context;
         Status status = stub_->Release(&context, request, &reply);
-        delete arr;
         if(status.ok()) {
             return;
         } else {
             //需要报错方式
         }
-    }
 
+        // void MmaClient::Free(ArrayList* arr) {
+        //     mma::ReleaseRequest request;
+        //     mma::ReleaseReply reply;
+        //     request.set_array_id(arr->array_id);
+        //     request.set_num_of_pages((arr->size+PageSize-1)/PageSize);
+        //     ClientContext context;
+        //     Status status = stub_->Release(&context, request, &reply);
+        //     delete arr;
+        //     if(status.ok()) {
+        //         return;
+        //     } else {
+        //         //需要报错方式
+        //     }
+        // }
+
+    }
 }

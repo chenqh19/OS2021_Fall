@@ -23,10 +23,6 @@
 
 namespace proj4 {
 
-using grpc::Server;
-using grpc::ServerBuilder;
-using grpc::ServerContext;
-using grpc::Status;
 
 class MMAServerImpl final : public mma::MMA::Service {
 // private:
@@ -34,13 +30,14 @@ class MMAServerImpl final : public mma::MMA::Service {
 // public: 
 //     explicit MMAServerImpl(int phy_page_num): mma(phy_page_num){};
 
-    grpc::Status ReadPage(ServerContext* context, const mma::ReadRequest *request, mma::ReadReply *reply) override;
+    grpc::Status ReadPage(grpc::ServerContext* context, const mma::ReadRequest *request, mma::ReadReply *reply) override;
 
-    grpc::Status WritePage(ServerContext* context, const mma::WriteRequest *request, mma::WriteReply *reply) override;
+    grpc::Status WritePage(grpc::ServerContext* context, const mma::WriteRequest *request, mma::WriteReply *reply) override;
 
-    grpc::Status Allocate(ServerContext* context, const mma::AllocateRequest *request, mma::AllocateReply *reply) override;
+    grpc::Status Allocate(grpc::ServerContext* context, const mma::AllocateRequest *request, mma::AllocateReply *reply) override;
 
-    grpc::Status Release(ServerContext* context, const mma::ReleaseRequest *request, mma::ReleaseReply *reply) override;
+    grpc::Status Release(grpc::ServerContext* context, const mma::ReleaseRequest *request, mma::ReleaseReply *reply) override;
+
 
 };
 
