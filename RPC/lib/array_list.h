@@ -14,6 +14,7 @@ namespace proj4 {
         size_t size;
         MmaClient* mma;
         int array_id;
+        int page_num;
         ArrayList(size_t, MmaClient*, int);
         ~ArrayList();
         public:

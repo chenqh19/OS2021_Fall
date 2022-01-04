@@ -72,6 +72,7 @@ void MmaClient::Free(ArrayList* arr) {
     mma::ReleaseRequest request;
     mma::ReleaseReply reply;
     request.set_array_id(arr->array_id);
+    request.set_num_of_pages((arr->size+PageSize-1)/PageSize);
     ClientContext context;
     Status status = stub_->Release(&context, request, &reply);
     if(status.ok()) {
