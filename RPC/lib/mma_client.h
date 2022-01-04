@@ -32,10 +32,6 @@ public:
     ArrayList* Allocate(size_t);
     // void Release(ArrayList*);
     void Free(ArrayList*);
-    
-
-
-
 };
 
 } //namespace proj4
