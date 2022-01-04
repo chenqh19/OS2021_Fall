@@ -50,10 +50,11 @@ class MemoryManager {
 public:
     // you should not modify the public interfaces used in tests
     MemoryManager(size_t);
+    MemoryManager(size_t, size_t);
     int ReadPage(int array_id, int virtual_page_id, int offset);
     void WritePage(int array_id, int virtual_page_id, int offset, int value);
-    ArrayList* Allocate(size_t);
-    void Release(ArrayList*);
+    int Allocate(size_t);
+    void Release(int, size_t);
     ~MemoryManager();
     bool FIFO = false;
 private:
@@ -64,6 +65,7 @@ private:
     bool* lkpp;
     int next_array_id;
     size_t mma_sz;
+    size_t remained_virtual_pages;
     /*add your extra states here freely for implementation*/
     std::vector<int> page_queue;
     std::vector<bool> clock_bit;

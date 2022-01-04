@@ -1,6 +1,6 @@
 #include "memory_manager.h"
 
-#include "array_list.h"
+// #include "array_list.h"
 
 namespace proj4 {
     PageFrame::PageFrame(){
@@ -59,9 +59,11 @@ namespace proj4 {
     int PageInfo::GetVid(){return virtual_page_id;}
     
 
-    MemoryManager::MemoryManager(size_t sz){
+
+    MemoryManager::MemoryManager(size_t sz, size_t max_virtual_pages){
         //mma should build its memory space with given space size
         //you should not allocate larger space than 'sz' (the number of physical pages)
+        this->remained_virtual_pages = max_virtual_pages;
         this->page_map.clear();
         this->mem =  new PageFrame*[sz]();
         for (int j = 0; j < sz; j++) {
@@ -78,6 +80,11 @@ namespace proj4 {
         this->next_array_id = 0;
         this->mma_sz = sz;
     }
+
+    MemoryManager::MemoryManager(size_t sz) {
+        MemoryManager(sz, 0xfffffffffffffff);
+    }
+
     MemoryManager::~MemoryManager(){
 
     }
@@ -320,30 +327,37 @@ namespace proj4 {
         }
         mem[ppid]->WriteContent(offset, value);
     }
-    ArrayList* MemoryManager::Allocate(size_t sz){
+    int MemoryManager::Allocate(size_t sz){
         // when an application requires for memory, create an ArrayList and record mappings from its virtual memory space to the physical memory space
         mtx->lock();
-        ArrayList* nalp = new ArrayList(sz, this, next_array_id);
+        // ArrayList* nalp = new ArrayList(sz, this, next_array_id);
         std::map<int, int> map;
-        page_map.insert(std::make_pair(next_array_id, map));
-        next_array_id++;
+        auto newly_added_pages = (sz + PageSize - 1)/PageSize;
+        if (newly_added_pages < remained_virtual_pages) {
+            page_map.insert(std::make_pair(next_array_id, map));
+            next_array_id++;
+            remained_virtual_pages -= newly_added_pages;
+            mtx->unlock();
+            return next_array_id;
+        }
         mtx->unlock();
-        return nalp;
+        return -1;
+        
     }
-    void MemoryManager::Release(ArrayList* arr){
+    void MemoryManager::Release(int array_id, size_t num_of_pages){
         // an application will call release() function when destroying its arrayList
         // release the virtual space of the arrayList and erase the corresponding mappings
         std::map<int, std::map<int, int>>::iterator iter;
         int i = 0;
         mtx->lock();
-        if (!page_map.count(arr->array_id)) {
+        if (!page_map.count(array_id)) {
             return;
         }
         
         while(iter != page_map.end()) {
-            if (page_map[arr->array_id].find(i) == page_map[arr->array_id].end()) {break;}
+            if (page_map[array_id].find(i) == page_map[array_id].end()) {break;}
             
-            int ppid = page_map[arr->array_id][i];
+            int ppid = page_map[array_id][i];
             page_info[ppid].ClearInfo();
             free_list[ppid] = false;
             int j = 0;
@@ -360,12 +374,13 @@ namespace proj4 {
             }
             i++;
         }
-        page_map.erase(arr->array_id);
+        page_map.erase(array_id);
+        remained_virtual_pages += num_of_pages;
         mtx->unlock();
         for (int j = 0; j < mma_sz; j++) {
-            std::remove(("./data/at" + std::to_string(arr->array_id) + "at" + std::to_string(j)).c_str());
+            std::remove(("./data/at" + std::to_string(array_id) + "at" + std::to_string(j)).c_str());
         }
         // next_array_id--; // not sure
-        arr->~ArrayList();
+        // arr->~ArrayList();
     }
 } // namespce: proj3

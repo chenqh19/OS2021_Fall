@@ -1,9 +1,8 @@
 #include "array_list.h"
 
-#include "memory_manager.h"
 
 namespace proj4 {
-    ArrayList::ArrayList(size_t sz, MemoryManager* cur_mma, int id){
+    ArrayList::ArrayList(size_t sz, MmaClient* cur_mma, int id){
         this->array_id = id;
         this->mma = cur_mma;
         this->size = sz;

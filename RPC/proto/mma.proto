@@ -14,22 +14,22 @@ service MMA{
 }
 
 message ReadRequest {
-    int array_id = 1;
-    int virtual_page_id = 2;
-    int offset = 3;
+    int32 array_id = 1;
+    int32 virtual_page_id = 2;
+    int32 offset = 3;
 
 }
 
 message ReadReply {
-    int data = 1;
+    int32 data = 1;
     
 }
 
 message WriteRequest {
-    int array_id = 1;
-    int virtual_page_id = 2; 
-    int offset = 3;
-    int value = 4;
+    int32 array_id = 1;
+    int32 virtual_page_id = 2; 
+    int32 offset = 3;
+    int32 value = 4;
     
 }
 
@@ -38,15 +38,16 @@ message WriteReply {
 }
 
 message AllocateRequest {
-    int size_t = 1;
+    int32 size = 1;
 }
 
 message AllocateReply {
-    int array_id = 1;
+    int32 array_id = 1;
 }
 
 message ReleaseRequest {
-    int array_id = 1;
+    int32 array_id = 1;
+    int32 num_of_pages = 2;
 }
 
 message ReleaseReply {
