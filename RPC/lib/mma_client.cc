@@ -53,6 +53,7 @@ void MmaClient::WritePage(int array_id, int virtual_page_id, int offset, int val
 }
 
 ArrayList* MmaClient::Allocate(size_t sz) {
+    while(true){
     mma::AllocateRequest request;
     mma::AllocateReply reply;
     request.set_size(sz);
@@ -62,10 +63,12 @@ ArrayList* MmaClient::Allocate(size_t sz) {
         return new ArrayList(reply.array_id(), this, sz);
     } else {
         //需要报错方式
-        std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
-            throw std::runtime_error("RPC failed");
+        //std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
+            //throw std::runtime_error("RPC failed");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
+}
 }
 
 void MmaClient::Free(ArrayList* arr) {

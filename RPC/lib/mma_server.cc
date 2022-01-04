@@ -27,7 +27,11 @@ grpc::Status WritePage(ServerContext* context, const mma::WriteRequest *request,
 
 grpc::Status Allocate(ServerContext* context, const mma::AllocateRequest *request, mma::AllocateReply *reply) {
     int array_id = mma->Allocate(request->size());
+    if(mma->remained_virtual_pages == 0) {
+        return Status::CANCELLED;
+    }
     reply->set_array_id(array_id);
+    mma->remained_virtual_pages -= 1;
     return Status::OK;
 }
 
@@ -68,6 +72,7 @@ void RunServerL(size_t phy_page_num, size_t max_vir_page_num) {
 }
 
 void ShutdownServer() {
+    server->Shutdown();
 
 }
 

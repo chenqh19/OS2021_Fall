@@ -3,7 +3,7 @@
 
 #include <chrono>
 
-namespace proj3 {
+namespace proj4 {
 
 void a_slow_function(int seconds);
 

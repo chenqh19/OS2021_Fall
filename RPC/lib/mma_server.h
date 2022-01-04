@@ -42,6 +42,7 @@ class MMAServerImpl final : public mma::MMA::Service {
 
     grpc::Status Release(ServerContext* context, const mma::ReleaseRequest *request, mma::ReleaseReply *reply) override;
 
+
 };
 
 // setup a server with UnLimited virtual memory space
