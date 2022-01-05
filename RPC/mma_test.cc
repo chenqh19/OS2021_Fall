@@ -28,7 +28,7 @@ class MMATestA : public ::testing::Test {
     workload_sz_4 = 2000;
     metrix_length = 10;
     loop_times = 10;
-    thread_num = 20;
+    thread_num = 14;
   }
   void TearDown() override {ShutdownServer(); delete mma;}
     size_t workload_sz_1;
@@ -73,86 +73,90 @@ class MMATestB : public ::testing::Test {
     std::thread* server_thread;
 };
 
-TEST_F(MMATestA,task1){
-	ArrayList* arr = mma->Allocate(workload_sz_1);
-    for(unsigned long i = 0; i<workload_sz_1; i++){
-        // std::cout << i << std::endl;
-        arr->Write(i, 1);
-    }
-    for(unsigned long i = 0; i<workload_sz_1; i++){
-        // std::cout << i << std::endl;
-        EXPECT_EQ(1, arr->Read(i));
-    }
-    mma->Free(arr);
-}
+// TEST_F(MMATestA,task1){
+// 	ArrayList* arr = mma->Allocate(workload_sz_1);
+//     for(unsigned long i = 0; i<workload_sz_1; i++){
+//         // std::cout << i << std::endl;
+//         arr->Write(i, i);
+//     }
+//     for(unsigned long i = 0; i<workload_sz_1; i++){
+//         // std::cout << i << std::endl;
+//         EXPECT_EQ(i, arr->Read(i));
+//     }
+//     mma->Free(arr);
+// }
 
-TEST_F(MMATestA,task2){
-	std::vector<ArrayList*>arr;
-    for(int i = 0; i<loop_times; i++){
-        arr.push_back(mma->Allocate(workload_sz_2));
-        for(unsigned long j = 0; j < workload_sz_2; j++)arr[i]->Write(j, i);
-    }
-    for(int i = 0; i<loop_times; i++){
-        if(i %2)mma->Free(arr[i]);
-        else for(unsigned long j = 0; j < workload_sz_2; j++)EXPECT_EQ(i, arr[i]->Read(j));
-    }
-    for(int i = 0; i<loop_times; i++){
-        if(i %2 == 0)mma->Free(arr[i]);
-    }
-}
+// TEST_F(MMATestA,task2){
+// 	std::vector<ArrayList*>arr;
+//     for(int i = 0; i<loop_times; i++){
+//         arr.push_back(mma->Allocate(workload_sz_2));
+//         for(unsigned long j = 0; j < workload_sz_2; j++)arr[i]->Write(j, i);
+//     }
+//     for(int i = 0; i<loop_times; i++){
+//         if(i %2)mma->Free(arr[i]);
+//         else for(unsigned long j = 0; j < workload_sz_2; j++)EXPECT_EQ(i, arr[i]->Read(j));
+//     }
+//     for(int i = 0; i<loop_times; i++){
+//         if(i %2 == 0)mma->Free(arr[i]);
+//     }
+// }
 
-TEST_F(MMATestA,task3){
-	std::vector<ArrayList*>metrixA, metrixB, metrixC;
-    for(int i = 0; i<metrix_length; i++){
-        metrixA.push_back(mma->Allocate(metrix_length));
-        metrixB.push_back(mma->Allocate(metrix_length));
-        metrixC.push_back(mma->Allocate(metrix_length));
-        for(int j = 0; j < metrix_length; j++){
-            metrixA[i]->Write(j, i*metrix_length+j);
-            metrixB[i]->Write(j, i*metrix_length+j);
-            metrixC[i]->Write(j, 0);
-        }
-    }
+// TEST_F(MMATestA,task3){
+// 	std::vector<ArrayList*>metrixA, metrixB, metrixC;
+//     for(int i = 0; i<metrix_length; i++){
+//         metrixA.push_back(mma->Allocate(metrix_length));
+//         metrixB.push_back(mma->Allocate(metrix_length));
+//         metrixC.push_back(mma->Allocate(metrix_length));
+//         for(int j = 0; j < metrix_length; j++){
+//             metrixA[i]->Write(j, i*metrix_length+j);
+//             metrixB[i]->Write(j, i*metrix_length+j);
+//             metrixC[i]->Write(j, 0);
+//         }
+//     }
     
-    for(int i = 0; i<metrix_length; i++){
-        for(int j = 0; j<metrix_length; j++){
-            for(int k = 0; k < metrix_length; k++){
-                metrixC[i]->Write(j, metrixC[i]->Read(j)+metrixA[i]->Read(k)*metrixB[k]->Read(j));
-            }
-        }
-    }
+//     for(int i = 0; i<metrix_length; i++){
+//         for(int j = 0; j<metrix_length; j++){
+//             for(int k = 0; k < metrix_length; k++){
+//                 metrixC[i]->Write(j, metrixC[i]->Read(j)+metrixA[i]->Read(k)*metrixB[k]->Read(j));
+//             }
+//         }
+//     }
 
-    for(int i = 0; i<metrix_length; i++){
-        for(int j = 0; j<metrix_length; j++){
-            EXPECT_EQ(metrix[i][j], metrixC[i]->Read(j));
-        }
-    }
+//     for(int i = 0; i<metrix_length; i++){
+//         for(int j = 0; j<metrix_length; j++){
+//             EXPECT_EQ(metrix[i][j], metrixC[i]->Read(j));
+//         }
+//     }
 
-    for(int i = 0; i<metrix_length; i++){
-        mma->Free(metrixA[i]);
-        mma->Free(metrixB[i]);
-        mma->Free(metrixC[i]);
-    }
+//     for(int i = 0; i<metrix_length; i++){
+//         mma->Free(metrixA[i]);
+//         mma->Free(metrixB[i]);
+//         mma->Free(metrixC[i]);
+//     }
 
-}
+// }
 
 void workload(MmaClient * my_mma, size_t workload_sz){
     ArrayList* arr = my_mma->Allocate(workload_sz);
-    for(unsigned long j = 0; j < workload_sz; j++)arr->Write(j, j);
+    for(unsigned long j = 0; j < workload_sz; j++) {
+    arr->Write(j, j);
+    // std::cout << "finish write" << j << std::endl;
+    }
     for(unsigned long j = 0; j < workload_sz; j++)EXPECT_EQ(j, arr->Read(j));
     my_mma->Free(arr);
 }
 
-TEST_F(MMATestA,task4){
-    std::vector<std::thread*> pool;
-    for(int i = 0; i<thread_num; i++) {
-        pool.push_back(new std::thread(&workload, mma, workload_sz_4));
-    }
+// TEST_F(MMATestA,task4){
+//     std::vector<std::thread*> pool;
+//     for(int i = 0; i<thread_num; i++) {
+//         // std::cout << "da" << i << std::endl;
+//         pool.push_back(new std::thread(&workload, mma, workload_sz_4));
+//     }
 
-    for (auto t: pool) {
-        t->join();
-    }
-}
+//     for (auto t: pool) {
+//         t->join();
+//     }
+// }
 
 TEST_F(MMATestB,task5){
     std::vector<std::thread*> pool;

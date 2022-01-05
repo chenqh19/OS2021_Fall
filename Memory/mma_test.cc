@@ -18,7 +18,7 @@ class MMATest : public ::testing::Test {
     workload_sz_4 = 2000;
     metrix_length = 10;
     loop_times = 100;
-    thread_num = 10;
+    thread_num = 14;
     //metrix = std::vector<std::vector<int>>(metrix_length, std::vector<int>(metrix_length, 0));
   }
   void TearDown() override {delete mma;}
@@ -42,40 +42,18 @@ class MMATest : public ::testing::Test {
     { 43350, 44295, 45240, 46185, 47130, 48075, 49020, 49965, 50910, 51855 },};
 };
 
-TEST_F(MMATest,task1){
-	proj3::ArrayList* arr = mma->Allocate(workload_sz_1);
-    for(unsigned long i = 0; i<workload_sz_1; i++){
-        arr->Write(i, 1);
-    }
-    for(unsigned long i = 0; i<workload_sz_1; i++){
-        EXPECT_EQ(1, arr->Read(i));
-    }
-    mma->Release(arr);
-}
+// TEST_F(MMATest,task1){
+// 	proj3::ArrayList* arr = mma->Allocate(workload_sz_1);
+//     for(unsigned long i = 0; i<workload_sz_1; i++){
+//         arr->Write(i, 1);
+//     }
+//     for(unsigned long i = 0; i<workload_sz_1; i++){
+//         EXPECT_EQ(1, arr->Read(i));
+//     }
+//     mma->Release(arr);
+// }
 
-TEST_F(MMATest,task2){
-	std::vector<proj3::ArrayList*>arr;
-    for(int i = 0; i<loop_times; i++){
-        // std::cerr <<"da" << i <<std::endl;
-        arr.push_back(mma->Allocate(workload_sz_2));
-        // std::cerr <<"gg" << i <<std::endl;
-        for(unsigned long j = 0; j < workload_sz_2; j++) {arr[i]->Write(j, i);
-        // std::cerr <<"pp" << i << " " << j <<std::endl;
-        }
-    }
-    for(int i = 0; i<loop_times; i++){
-        // std::cerr <<"pp" << i <<std::endl;
-        if(i %2)mma->Release(arr[i]);
-        else for(unsigned long j = 0; j < workload_sz_2; j++){if(i!=arr[i]->Read(j))throw std::runtime_error("qewew ");EXPECT_EQ(i, arr[i]->Read(j));}
-    }
-    for(int i = 0; i<loop_times; i++){
-        // std::cerr <<"oo" << i <<std::endl;
-        if(i %2 == 0)mma->Release(arr[i]);
-    }
-}
-
-// TEST_F(MMATest,task3){
-//     mma->FIFO = true;
+// TEST_F(MMATest,task2){
 // 	std::vector<proj3::ArrayList*>arr;
 //     for(int i = 0; i<loop_times; i++){
 //         // std::cerr <<"da" << i <<std::endl;
@@ -96,39 +74,61 @@ TEST_F(MMATest,task2){
 //     }
 // }
 
-TEST_F(MMATest,task3){
-	std::vector<proj3::ArrayList*>metrixA, metrixB, metrixC;
-    for(int i = 0; i<metrix_length; i++){
-        metrixA.push_back(mma->Allocate(metrix_length));
-        metrixB.push_back(mma->Allocate(metrix_length));
-        metrixC.push_back(mma->Allocate(metrix_length));
-        for(int j = 0; j < metrix_length; j++){
-            metrixA[i]->Write(j, i*metrix_length+j);
-            metrixB[i]->Write(j, i*metrix_length+j);
-        }
-    }
+// // TEST_F(MMATest,task3){
+// //     mma->FIFO = true;
+// // 	std::vector<proj3::ArrayList*>arr;
+// //     for(int i = 0; i<loop_times; i++){
+// //         // std::cerr <<"da" << i <<std::endl;
+// //         arr.push_back(mma->Allocate(workload_sz_2));
+// //         // std::cerr <<"gg" << i <<std::endl;
+// //         for(unsigned long j = 0; j < workload_sz_2; j++) {arr[i]->Write(j, i);
+// //         // std::cerr <<"pp" << i << " " << j <<std::endl;
+// //         }
+// //     }
+// //     for(int i = 0; i<loop_times; i++){
+// //         // std::cerr <<"pp" << i <<std::endl;
+// //         if(i %2)mma->Release(arr[i]);
+// //         else for(unsigned long j = 0; j < workload_sz_2; j++){if(i!=arr[i]->Read(j))throw std::runtime_error("qewew ");EXPECT_EQ(i, arr[i]->Read(j));}
+// //     }
+// //     for(int i = 0; i<loop_times; i++){
+// //         // std::cerr <<"oo" << i <<std::endl;
+// //         if(i %2 == 0)mma->Release(arr[i]);
+// //     }
+// // }
+
+// TEST_F(MMATest,task3){
+// 	std::vector<proj3::ArrayList*>metrixA, metrixB, metrixC;
+//     for(int i = 0; i<metrix_length; i++){
+//         metrixA.push_back(mma->Allocate(metrix_length));
+//         metrixB.push_back(mma->Allocate(metrix_length));
+//         metrixC.push_back(mma->Allocate(metrix_length));
+//         for(int j = 0; j < metrix_length; j++){
+//             metrixA[i]->Write(j, i*metrix_length+j);
+//             metrixB[i]->Write(j, i*metrix_length+j);
+//         }
+//     }
     
-    for(int i = 0; i<metrix_length; i++){
-        for(int j = 0; j<metrix_length; j++){
-            for(int k = 0; k < metrix_length; k++){
-                metrixC[i]->Write(j, metrixC[i]->Read(j)+metrixA[i]->Read(k)*metrixB[k]->Read(j));
-            }
-        }
-    }
+//     for(int i = 0; i<metrix_length; i++){
+//         for(int j = 0; j<metrix_length; j++){
+//             for(int k = 0; k < metrix_length; k++){
+//                 metrixC[i]->Write(j, metrixC[i]->Read(j)+metrixA[i]->Read(k)*metrixB[k]->Read(j));
+//             }
+//         }
+//     }
 
-    for(int i = 0; i<metrix_length; i++){
-        for(int j = 0; j<metrix_length; j++){
-            EXPECT_EQ(metrix[i][j], metrixC[i]->Read(j));
-        }
-    }
+//     for(int i = 0; i<metrix_length; i++){
+//         for(int j = 0; j<metrix_length; j++){
+//             EXPECT_EQ(metrix[i][j], metrixC[i]->Read(j));
+//         }
+//     }
 
-    for(int i = 0; i<metrix_length; i++){
-        mma->Release(metrixA[i]);
-        mma->Release(metrixB[i]);
-        mma->Release(metrixC[i]);
-    }
+//     for(int i = 0; i<metrix_length; i++){
+//         mma->Release(metrixA[i]);
+//         mma->Release(metrixB[i]);
+//         mma->Release(metrixC[i]);
+//     }
 
-}
+// }
 
 void workload(proj3::MemoryManager * my_mma, size_t workload_sz){
     proj3::ArrayList* arr = my_mma->Allocate(workload_sz);

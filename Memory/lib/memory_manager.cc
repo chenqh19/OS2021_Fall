@@ -176,30 +176,30 @@ namespace proj3 {
                         usleep(200);
                     }
 
-                    bool flag = 0;
-                    do {
-                        flag = 0;
-                        mtx2->lock();
-                        for (int i = 0; i < locker.size(); i++) {
-                            if (array_id == locker[i]) {
-                                flag = 1;
-                            }
-                        }
-                        if (flag == 0) {
-                            locker.push_back(array_id);
-                        } 
-                        mtx2->unlock();
-                        if (flag == 1) {
-                            usleep(100);
-                        }
-                    } while (flag == 1);
+                    // bool flag = 0;
+                    // do {
+                    //     flag = 0;
+                    //     mtx2->lock();
+                    //     for (int i = 0; i < locker.size(); i++) {
+                    //         if (array_id == locker[i]) {
+                    //             flag = 1;
+                    //         }
+                    //     }
+                    //     if (flag == 0) {
+                    //         locker.push_back(array_id);
+                    //     } 
+                    //     mtx2->unlock();
+                    //     if (flag == 1) {
+                    //         usleep(100);
+                    //     }
+                    // } while (flag == 1);
 
                     std::string fname = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
                     mem[ppid]->ReadDisk(fname);
 
-                    mtx2->lock();
-                    std::remove(locker.begin(),locker.end(),array_id);
-                    mtx2->unlock();
+                    // mtx2->lock();
+                    // std::remove(locker.begin(),locker.end(),array_id);
+                    // mtx2->unlock();
 
                     mtx1->lock();
                     lkpp[ppid] = false;
@@ -223,6 +223,29 @@ namespace proj3 {
                     PageOut(ppid);
                     PageIn(array_id, virtual_page_id, ppid);
 
+                    
+                    // bool flag1 = 0;
+                    // do {
+                    //     flag1 = 0;
+                    //     mtx2->lock();
+                    //     for (int i = 0; i < locker.size(); i++) {
+                    //         if (hd == locker[i]) {
+                    //             flag1 = 1;
+                    //         }
+                    //     }
+                    //     if (flag1 == 0) {
+                    //         locker.push_back(hd);
+                    //     } 
+                    //     mtx2->unlock();
+                    //     if (flag1 == 1) {
+                    //         usleep(100);
+                    //     }
+                    // } while (flag1 == 1);
+
+
+                    std::string fname = "./data/at" + std::to_string(hd) + "at" + std::to_string(vid);
+                    mem[ppid]->WriteDisk(fname); // use a uniform rule of naming
+
                     mtx->unlock();
                     while (true) {
                         mtx1->lock();
@@ -234,56 +257,35 @@ namespace proj3 {
                         mtx1->unlock();
                         usleep(200);
                     }
-                    
-                    bool flag1 = 0;
-                    do {
-                        flag1 = 0;
-                        mtx2->lock();
-                        for (int i = 0; i < locker.size(); i++) {
-                            if (hd == locker[i]) {
-                                flag1 = 1;
-                            }
-                        }
-                        if (flag1 == 0) {
-                            locker.push_back(hd);
-                        } 
-                        mtx2->unlock();
-                        if (flag1 == 1) {
-                            usleep(100);
-                        }
-                    } while (flag1 == 1);
 
-                    std::string fname = "./data/at" + std::to_string(hd) + "at" + std::to_string(vid);
-                    mem[ppid]->WriteDisk(fname); // use a uniform rule of naming
+                    // mtx2->lock();
+                    // std::remove(locker.begin(),locker.end(),hd);
+                    // mtx2->unlock();
 
-                    mtx2->lock();
-                    std::remove(locker.begin(),locker.end(),hd);
-                    mtx2->unlock();
-
-                    bool flag2 = 0;
-                    do {
-                        flag2 = 0;
-                        mtx2->lock();
-                        for (int i = 0; i < locker.size(); i++) {
-                            if (array_id == locker[i]) {
-                                flag2 = 1;
-                            }
-                        }
-                        if (flag2 == 0) {
-                            locker.push_back(array_id);
-                        } 
-                        mtx2->unlock();
-                        if (flag2 == 1) {
-                            usleep(100);
-                        }
-                    } while (flag2 == 1);
+                    // bool flag2 = 0;
+                    // do {
+                    //     flag2 = 0;
+                    //     mtx2->lock();
+                    //     for (int i = 0; i < locker.size(); i++) {
+                    //         if (array_id == locker[i]) {
+                    //             flag2 = 1;
+                    //         }
+                    //     }
+                    //     if (flag2 == 0) {
+                    //         locker.push_back(array_id);
+                    //     } 
+                    //     mtx2->unlock();
+                    //     if (flag2 == 1) {
+                    //         usleep(100);
+                    //     }
+                    // } while (flag2 == 1);
 
                     std::string fname1 = "./data/at" + std::to_string(array_id) + "at" + std::to_string(virtual_page_id);
                     mem[ppid]->ReadDisk(fname1);
 
-                    mtx2->lock();
-                    std::remove(locker.begin(),locker.end(),array_id);
-                    mtx2->unlock();
+                    // mtx2->lock();
+                    // std::remove(locker.begin(),locker.end(),array_id);
+                    // mtx2->unlock();
 
                     mtx1->lock();
                     lkpp[ppid] = false;

@@ -44,7 +44,9 @@ namespace proj4{
         request.set_value(value);
         ClientContext context;
         Status status = stub_->WritePage(&context, request, &reply);
+        // std::cout << "write" << std::endl;
         if(status.ok()) {
+            return;
         } else {
             //需要报错方式
             std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
@@ -56,20 +58,25 @@ namespace proj4{
         mma::AllocateRequest request;
         mma::AllocateReply reply;
         request.set_size(sz);
+        Status status;
         while(true){
             ClientContext context;
-            Status status = stub_->Allocate(&context, request, &reply);
-            // std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            if(status.ok()) {
-                if (reply.array_id() != -1) 
-                return new ArrayList(sz, this, reply.array_id());
-            } else {
-                //需要报错方式
-                std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
-                    throw std::runtime_error("RPC failed when allocate");
-                // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            status = stub_->Allocate(&context, request, &reply);
+            if (reply.array_id() != -1) {
+                break;
             }
+            // std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
+        if(status.ok()) {
+                
+            return new ArrayList(sz, this, reply.array_id());
+        } else {
+            //需要报错方式
+            std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
+            throw std::runtime_error("RPC failed when allocate");
+            // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        
     }
 
     void MmaClient::Free(ArrayList* arr) {
@@ -79,6 +86,8 @@ namespace proj4{
         request.set_num_of_pages((arr->size+PageSize-1)/PageSize);
         ClientContext context;
         Status status = stub_->Release(&context, request, &reply);
+        delete arr;
+        // std::cout << "free" << std::endl;
         if(status.ok()) {
             return;
         } else {
