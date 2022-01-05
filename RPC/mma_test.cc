@@ -2,6 +2,7 @@
 #include<vector>
 #include<thread>
 #include<string>
+#include<iostream>
 
 #include "lib/array_list.h"
 #include "lib/mma_client.h"
@@ -75,9 +76,11 @@ class MMATestB : public ::testing::Test {
 TEST_F(MMATestA,task1){
 	ArrayList* arr = mma->Allocate(workload_sz_1);
     for(unsigned long i = 0; i<workload_sz_1; i++){
+        // std::cout << i << std::endl;
         arr->Write(i, 1);
     }
     for(unsigned long i = 0; i<workload_sz_1; i++){
+        // std::cout << i << std::endl;
         EXPECT_EQ(1, arr->Read(i));
     }
     mma->Free(arr);

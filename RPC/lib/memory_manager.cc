@@ -81,9 +81,7 @@ namespace proj4 {
         this->mma_sz = sz;
     }
 
-    MemoryManager::MemoryManager(size_t sz) {
-        MemoryManager(sz, 0xfffffffffffffff);
-    }
+    MemoryManager::MemoryManager(size_t sz): MemoryManager(sz, 999999999) {}
 
     MemoryManager::~MemoryManager(){
         
@@ -319,12 +317,16 @@ namespace proj4 {
         // for arrayList of 'array_id', write 'value' into the target position on its virtual space
         mtx->lock();
         int ppid;
+        // std::cout << "da" << virtual_page_id << std::endl;
         if (!page_map[array_id].count(virtual_page_id)) {
+            // std::cout << "shit" << virtual_page_id << std::endl;
             ppid = PageReplace(array_id, virtual_page_id);
         } else {
+            // std::cout << "ass" << virtual_page_id << std::endl;
             ppid = page_map[array_id][virtual_page_id];
             mtx->unlock();
         }
+        // std::cout << "da" << virtual_page_id << std::endl;
         mem[ppid]->WriteContent(offset, value);
     }
     int MemoryManager::Allocate(size_t sz){
@@ -333,6 +335,7 @@ namespace proj4 {
         // ArrayList* nalp = new ArrayList(sz, this, next_array_id);
         std::map<int, int> map;
         auto newly_added_pages = (sz + PageSize - 1)/PageSize;
+        // std::cout << newly_added_pages << " " << remained_virtual_pages << std::endl;
         if (newly_added_pages < remained_virtual_pages) {
             page_map.insert(std::make_pair(next_array_id, map));
             next_array_id++;

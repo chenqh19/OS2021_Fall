@@ -31,7 +31,7 @@ namespace proj4{
         } else {
             //需要报错方式
             std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
-                throw std::runtime_error("RPC failed");
+                throw std::runtime_error("RPC failed when read page");
         }
     }
 
@@ -48,26 +48,27 @@ namespace proj4{
         } else {
             //需要报错方式
             std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
-                throw std::runtime_error("RPC failed");
+                throw std::runtime_error("RPC failed when write page");
         }
     }
 
     ArrayList* MmaClient::Allocate(size_t sz) {
+        mma::AllocateRequest request;
+        mma::AllocateReply reply;
+        request.set_size(sz);
         while(true){
-            mma::AllocateRequest request;
-            mma::AllocateReply reply;
-            request.set_size(sz);
             ClientContext context;
             Status status = stub_->Allocate(&context, request, &reply);
+            // std::this_thread::sleep_for(std::chrono::milliseconds(100));
             if(status.ok()) {
-                return new ArrayList(reply.array_id(), this, sz);
+                if (reply.array_id() != -1) 
+                return new ArrayList(sz, this, reply.array_id());
             } else {
                 //需要报错方式
-                //std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
-                    //throw std::runtime_error("RPC failed");
+                std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
+                    throw std::runtime_error("RPC failed when allocate");
                 // std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
-
         }
     }
 
@@ -81,6 +82,8 @@ namespace proj4{
         if(status.ok()) {
             return;
         } else {
+            std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
+            throw std::runtime_error("RPC failed when free");
             //需要报错方式
         }
 
